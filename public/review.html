@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Passage — Assessment Review</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f7f6f3;
+      --surface:   #ffffff;
+      --low:       #f1f4f6;
+      --header:    #1c1b18;
+      --text:      #2b3437;
+      --muted:     #586064;
+      --dim:       #9a9fa2;
+      --border:    #e5e3de;
+      --soft:      #eeece8;
+      --orange:    #FF6F00;
+      --orange-bg: #fff7f0;
+      --green:     #1a7f4b;
+      --green-bg:  #f0faf4;
+      --red:       #9e3f4e;
+      --red-bg:    #fdf0f0;
+      --amber:     #8a6000;
+      --amber-bg:  #fefaf0;
+      --sans:      'Inter', system-ui, sans-serif;
+    }
+
+    html { font-size: 14px; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── SESSIONS DRAWER ────────────────────────────────── */
+
+    .drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.15);
+      z-index: 59;
+    }
+
+    .drawer-backdrop.open { display: block; }
+
+    .sessions-drawer {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      z-index: 60;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sessions-drawer.open { transform: translateX(0); }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .drawer-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .drawer-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--dim);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 3px;
+      transition: background 0.12s;
+    }
+
+    .drawer-close:hover { background: var(--low); color: var(--text); }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .drawer-body::-webkit-scrollbar { width: 3px; }
+    .drawer-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .drawer-loading,
+    .drawer-error,
+    .drawer-empty {
+      padding: 32px 18px;
+      font-size: 11.5px;
+      color: var(--dim);
+      text-align: center;
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    .drawer-error { color: var(--red); font-style: normal; }
+
+    .session-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 11px 18px;
+      border-bottom: 1px solid var(--soft);
+      cursor: pointer;
+      transition: background 0.12s;
+      text-decoration: none;
+    }
+
+    .session-row:hover { background: var(--low); }
+    .session-row.current { background: var(--orange-bg); }
+
+    .session-id {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .session-row.current .session-id { color: var(--orange); }
+
+    .session-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .session-date {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .session-dur {
+      font-size: 10px;
+      color: var(--dim);
+    }
+
+    .session-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    /* Toggle button in header */
+    .btn-sessions {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 4px;
+      padding: 5px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      transition: color 0.12s, border-color 0.12s, background 0.12s;
+    }
+
+    .btn-sessions:hover {
+      color: rgba(255,255,255,0.75);
+      border-color: rgba(255,255,255,0.28);
+      background: rgba(255,255,255,0.06);
+    }
+
+    /* ── HEADER ─────────────────────────────────────────── */
+
+    .header {
+      background: var(--header);
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-logo svg { height: 20px; width: auto; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 4px;
+      padding: 3px 8px;
+    }
+
+    /* ── META BAR ───────────────────────────────────────── */
+
+    .meta-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+    }
+
+    .meta-bar-inner {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .meta-bar-inner::-webkit-scrollbar { display: none; }
+
+    .meta-field {
+      padding: 11px 20px 11px 0;
+      margin-right: 20px;
+      border-right: 1px solid var(--soft);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .meta-field:last-child { border-right: none; }
+
+    .meta-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 2px;
+    }
+
+    .meta-value {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .meta-value.mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11.5px; }
+
+    /* ── TOP SUMMARY ROW ────────────────────────────────── */
+
+    .summary-row {
+      display: none;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0;
+    }
+
+    .summary-row.visible { display: grid; }
+
+    .summary-cell {
+      padding: 16px 20px;
+      border-right: 1px solid var(--soft);
+    }
+
+    .summary-cell:last-child { border-right: none; }
+
+    .summary-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 8px;
+    }
+
+    .summary-value {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .summary-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .summary-dot.green  { background: var(--green); }
+    .summary-dot.amber  { background: var(--amber); }
+    .summary-dot.red    { background: var(--red); }
+
+    .summary-concerns {
+      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .summary-concern-item {
+      font-size: 10.5px;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      line-height: 1.4;
+    }
+
+    .summary-concern-item::before {
+      content: '·';
+      color: var(--dim);
+      flex-shrink: 0;
+    }
+
+    /* ── PROCESSING STATE ───────────────────────────────── */
+
+    #state-processing {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 52px);
+      gap: 28px;
+      text-align: center;
+      padding: 48px 24px;
+    }
+
+    .proc-orb {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: 0 4px 32px rgba(43,52,55,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .proc-spinner {
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--orange);
+      border-right-color: var(--orange);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .proc-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--orange); }
+
+    .proc-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .proc-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .proc-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+      min-width: 240px;
+    }
+
+    .pstep {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--dim);
+      font-weight: 500;
+    }
+
+    .pstep.done   { color: var(--muted); }
+    .pstep.active { color: var(--text); font-weight: 600; }
+
+    .pstep-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+
+    .pstep.done  .pstep-dot { background: #34d399; }
+    .pstep.active .pstep-dot { background: var(--orange); animation: blink 0.8s infinite; }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── ERROR STATE ────────────────────────────────────── */
+
+    #state-error {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 52px);
+      gap: 16px;
+      text-align: center;
+      padding: 48px 24px;
+    }
+
+    .error-title { font-size: 18px; font-weight: 600; color: var(--red); }
+    .error-msg   { font-size: 13px; color: var(--muted); max-width: 400px; line-height: 1.6; }
+
+    /* ── MAIN CONTENT ───────────────────────────────────── */
+
+    #state-results {
+      display: none;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      min-height: calc(100vh - 52px - 44px - 52px);
+    }
+
+    /* ── LEFT: TRANSCRIPT ───────────────────────────────── */
+
+    .transcript-panel {
+      border-right: 1px solid var(--border);
+      padding: 24px 24px 100px;
+      overflow-y: auto;
+      position: sticky;
+      top: 96px;
+      max-height: calc(100vh - 96px);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .transcript-panel::-webkit-scrollbar { width: 3px; }
+    .transcript-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .panel-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .turn-count-label {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--dim);
+      background: var(--low);
+      border-radius: 4px;
+      padding: 2px 7px;
+    }
+
+    .turn {
+      margin-bottom: 20px;
+    }
+
+    .turn-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 5px;
+    }
+
+    .speaker {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .speaker.ella    { color: var(--orange); }
+    .speaker.student { color: var(--muted); }
+
+    .turn-ts {
+      font-size: 9px;
+      color: var(--dim);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .turn-body {
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: var(--text);
+      padding-left: 3px;
+    }
+
+    .turn-body.ella-body { color: var(--muted); font-style: italic; }
+
+    /* Annotation highlight states */
+    .turn.flag-contradiction .turn-body {
+      background: linear-gradient(to right, #fff3f3, transparent);
+      border-left: 2px solid var(--red);
+      padding-left: 8px;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .turn.flag-weak .turn-body {
+      background: linear-gradient(to right, #fffbf0, transparent);
+      border-left: 2px solid var(--amber);
+      padding-left: 8px;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .turn.flag-missing .turn-body {
+      background: linear-gradient(to right, #f7f7f7, transparent);
+      border-left: 2px solid var(--dim);
+      padding-left: 8px;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .annotation-key {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--soft);
+    }
+
+    .ann-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 9.5px;
+      color: var(--dim);
+    }
+
+    .ann-bar { width: 10px; height: 3px; border-radius: 2px; }
+
+    /* ── RIGHT: ANALYSIS ────────────────────────────────── */
+
+    .analysis-panel {
+      padding: 24px 28px 100px;
+      overflow-y: auto;
+      max-height: calc(100vh - 96px);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .analysis-panel::-webkit-scrollbar { width: 3px; }
+    .analysis-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Executive Summary */
+    .exec-summary {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 20px 22px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 16px rgba(43,52,55,0.04);
+    }
+
+    .exec-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 10px;
+    }
+
+    .exec-text {
+      font-size: 13.5px;
+      line-height: 1.75;
+      color: var(--text);
+      font-weight: 300;
+    }
+
+    /* Dimensions */
+    .dimensions-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 14px;
+    }
+
+    .dimension-list {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 28px;
+    }
+
+    /* Updated dim-row: 3-zone 12-col grid style */
+    .dim-row {
+      display: grid;
+      grid-template-columns: 5fr 2fr 5fr;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 10px;
+      border-bottom: 1px solid var(--soft);
+      border-radius: 4px;
+      transition: background 0.12s;
+      cursor: default;
+    }
+
+    .dim-row:last-child { border-bottom: none; }
+    .dim-row:hover { background: var(--low); }
+
+    .dim-zone-name {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .dim-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .dim-source-tag {
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .dim-zone-quality {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .quality-mark {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .q-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .q-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .q-strong      .q-dot { background: var(--green); }
+    .q-strong      .q-label { color: var(--green); }
+    .q-medium      .q-dot { background: var(--amber); }
+    .q-medium      .q-label { color: var(--amber); }
+    .q-weak        .q-dot { background: var(--red); }
+    .q-weak        .q-label { color: var(--red); }
+    .q-not_assessed .q-dot { background: var(--border); border: 1.5px dashed var(--dim); width: 6px; height: 6px; }
+    .q-not_assessed .q-label { color: var(--dim); }
+
+    /* Risk level */
+    .risk-badge {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 2px 9px;
+      border-radius: 3px;
+    }
+
+    .risk-low    { background: var(--green-bg); color: var(--green); }
+    .risk-medium { background: var(--amber-bg); color: var(--amber); }
+    .risk-high   { background: var(--red-bg);   color: var(--red); }
+
+    .dim-zone-rationale {
+      font-size: 11.5px;
+      line-height: 1.55;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    /* ── RISK ASSESSMENT BLOCK ──────────────────────────── */
+
+    .risk-block {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 6px rgba(43,52,55,0.04);
+    }
+
+    .risk-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .risk-block-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .risk-level-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .risk-level-label.high   { color: var(--red); }
+    .risk-level-label.medium { color: var(--amber); }
+    .risk-level-label.low    { color: var(--green); }
+
+    .risk-bar-track {
+      width: 100%;
+      height: 4px;
+      background: var(--low);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 7px;
+    }
+
+    .risk-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.8s ease;
+    }
+
+    .risk-bar-fill.high   { background: var(--red); width: 75%; }
+    .risk-bar-fill.medium { background: var(--amber); width: 50%; }
+    .risk-bar-fill.low    { background: var(--green); width: 25%; }
+
+    .risk-sub-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    /* Flags / Missing */
+    .flags-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .flags-block {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 16px 18px;
+    }
+
+    .flags-title {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .flags-title.red    { color: var(--red); }
+    .flags-title.neutral { color: var(--dim); }
+
+    .flag-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 9px;
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .flag-item:last-child { margin-bottom: 0; }
+
+    .flag-glyph { flex-shrink: 0; margin-top: 2px; font-size: 11px; color: var(--red); }
+    .missing-glyph { flex-shrink: 0; margin-top: 2px; font-size: 11px; color: var(--dim); }
+
+    /* Reviewer confidence */
+    .confidence-block {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .confidence-left { }
+
+    .confidence-title {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 8px;
+    }
+
+    .confidence-bar-track {
+      width: 140px;
+      height: 3px;
+      background: var(--low);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .confidence-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--text);
+      transition: width 1s ease;
+    }
+
+    .confidence-value {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .confidence-note {
+      font-size: 11px;
+      color: var(--dim);
+      max-width: 260px;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    /* Reviewer note */
+    .reviewer-note {
+      background: var(--amber-bg);
+      border: 1px solid #f5e09a;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: var(--text);
+      font-style: italic;
+      margin-bottom: 24px;
+    }
+
+    /* ── BOTTOM ACTION BAR ──────────────────────────────── */
+
+    .action-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(247,246,243,0.92);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      height: 56px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+    }
+
+    .action-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .action-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--dim);
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 8px 18px;
+      border-radius: 5px;
+      border: 1px solid;
+      cursor: pointer;
+      transition: opacity 0.12s, transform 0.1s;
+    }
+
+    .action-btn:hover   { opacity: 0.8; transform: translateY(-1px); }
+    .action-btn:active  { transform: translateY(0); }
+
+    .btn-followup { background: var(--amber-bg); color: var(--amber); border-color: #f5d97a; }
+    .btn-clear    { background: var(--header); color: #fff; border-color: var(--header); }
+    .btn-escalate { background: var(--red-bg); color: var(--red); border-color: #f5bcbc; }
+
+    /* ── UTILITY ────────────────────────────────────────── */
+
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .fadein { animation: fadein 0.4s ease forwards; }
+
+    /* ── RESPONSIVE ─────────────────────────────────────── */
+
+    @media (max-width: 900px) {
+      .content-grid { grid-template-columns: 1fr; }
+      .transcript-panel { position: static; max-height: 50vh; border-right: none; border-bottom: 1px solid var(--border); }
+      .analysis-panel { max-height: none; }
+      .flags-grid { grid-template-columns: 1fr; }
+      .summary-row { grid-template-columns: 1fr 1fr; }
+      .dim-row { grid-template-columns: 1fr; gap: 8px; }
+      .dim-zone-rationale { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── SESSIONS DRAWER ───────────────────────────────────────────────────── -->
+<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+<aside class="sessions-drawer" id="sessions-drawer">
+  <div class="drawer-header">
+    <span class="drawer-title">Recent Sessions</span>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close drawer">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8">
+        <line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/>
+      </svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="drawer-body">
+    <div class="drawer-loading" id="drawer-loading">Loading sessions…</div>
+  </div>
+</aside>
+
+<!-- ── HEADER ───────────────────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-logo">
+    <svg viewBox="0 0 343 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0V59.661H12.2034V43.3898H23.0508C28.8047 43.3898 34.3229 41.1041 38.3915 37.0355C42.46 32.967 44.7458 27.4488 44.7458 21.6949C44.7458 15.9411 42.4601 10.4229 38.3915 6.3543C34.3229 2.28571 28.8047 0 23.0508 0H0ZM21.6972 32.5424H12.2034V10.8475H21.6949C24.5718 10.8475 27.3309 11.9903 29.3652 14.0246C31.3995 16.0589 32.5424 18.818 32.5424 21.6949C32.5424 24.5718 31.3995 27.3309 29.3652 29.3652C27.3315 31.399 24.5733 32.5418 21.6972 32.5424Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M66.4407 61.017C54.9153 61.017 44.7458 50.8476 44.7458 37.9662C44.7458 25.0848 54.9153 14.9153 66.4407 14.9153C74.5763 14.9153 77.2881 17.6271 79.322 19.661L80.678 16.2713H90.8475V59.6611H80.678L79.322 56.2712C77.2881 58.3051 74.5762 61.017 66.4407 61.017ZM56.2712 37.9662C56.2712 31.1865 61.9686 25.7628 68.7482 25.7628C75.5279 25.7628 80.678 31.1865 80.678 37.9662C80.678 44.7459 75.2542 50.1696 68.4746 50.1696C61.6949 50.1696 56.2712 44.7459 56.2712 37.9662Z" fill="white"/>
+      <path d="M105.514 39.845L105.495 39.8377L105.476 39.8315C99.8155 38.0232 95.3878 34.4283 95.3878 28.8773C95.3878 20.5763 102.946 14.9153 111.91 14.9153C114.758 14.9153 118.603 15.4838 121.85 17.4382C124.919 19.2849 127.495 22.3895 128.19 27.5593H116.518C116.437 27.0421 116.257 26.3709 115.792 25.7638C115.083 24.8383 113.834 24.1993 111.75 24.1993C110.2 24.1993 109.077 24.6909 108.34 25.4279C107.615 26.1529 107.312 27.0689 107.312 27.8373C107.312 29.3957 108.388 30.5138 109.716 31.3258C111.057 32.1452 112.831 32.7654 114.598 33.2876L114.609 33.2907C118.397 34.3383 122.157 35.3927 124.986 37.3361C127.754 39.238 129.632 41.9951 129.632 46.5573C129.632 55.4049 121.85 60.9993 112.23 60.9993C108.956 60.9993 104.872 60.2562 101.481 58.1234C98.2696 56.1039 95.648 52.8225 94.9152 47.6353H106.784C107.223 49.5582 108.402 50.6039 109.589 51.1443C110.843 51.7153 112.082 51.7153 112.385 51.7153H112.39C113.627 51.7153 114.922 51.3644 115.927 50.6904C116.941 50.0108 117.708 48.9615 117.708 47.5973C117.708 46.8078 117.554 46.1121 117.196 45.4906C116.841 44.8736 116.314 44.3808 115.651 43.9474C114.376 43.114 112.438 42.4067 109.848 41.4614L109.749 41.4254C108.509 40.9726 107.103 40.4595 105.514 39.845Z" fill="white"/>
+      <path d="M142.125 39.845L142.106 39.8377L142.086 39.8315C136.426 38.0232 131.998 34.4283 131.998 28.8773C131.998 20.5763 139.556 14.9153 148.52 14.9153C151.368 14.9153 155.213 15.4838 158.46 17.4382C161.529 19.2849 164.105 22.3895 164.8 27.5593H153.128C153.048 27.0421 152.867 26.3709 152.402 25.7638C151.693 24.8383 150.444 24.1993 148.36 24.1993C146.81 24.1993 145.688 24.6909 144.951 25.4279C144.226 26.1529 143.922 27.0689 143.922 27.8373C143.922 29.3957 144.998 30.5138 146.326 31.3258C147.667 32.1452 149.441 32.7654 151.208 33.2876L151.219 33.2907C155.007 34.3383 158.768 35.3927 161.596 37.3361C164.364 39.238 166.242 41.9951 166.242 46.5573C166.242 55.4049 158.46 60.9993 148.84 60.9993C145.566 60.9993 141.482 60.2562 138.091 58.1234C134.88 56.1039 132.258 52.8225 131.525 47.6353H143.395C143.833 49.5582 145.012 50.6039 146.199 51.1443C147.453 51.7153 148.692 51.7153 148.996 51.7153H149C150.237 51.7153 151.532 51.3644 152.538 50.6904C153.551 50.0108 154.318 48.9615 154.318 47.5973C154.318 46.8078 154.164 46.1121 153.806 45.4906C153.451 44.8736 152.924 44.3808 152.261 43.9474C150.986 43.114 149.048 42.4067 146.458 41.4614L146.359 41.4254C145.119 40.9726 143.713 40.4595 142.125 39.845Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M168.136 37.9662C168.136 50.8476 178.305 61.017 189.83 61.017C197.966 61.017 200.678 58.3051 202.712 56.2712L204.068 59.6611H214.237V16.2713H204.068L202.712 19.661C200.678 17.6271 197.966 14.9153 189.83 14.9153C178.305 14.9153 168.136 25.0848 168.136 37.9662ZM192.138 25.7628C185.358 25.7628 179.661 31.1865 179.661 37.9662C179.661 44.7459 185.085 50.1696 191.864 50.1696C198.644 50.1696 204.068 44.7459 204.068 37.9662C204.068 31.1865 198.918 25.7628 192.138 25.7628Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M240 61.017C228.475 61.017 218.305 50.8476 218.305 37.9662C218.305 25.0848 228.475 14.9153 240 14.9153C248.136 14.9153 250.847 17.6271 252.881 19.661L254.237 16.2713H264.407V58.3051C264.342 60.9406 264.023 64.1081 262.808 67.2042C261.295 71.0625 258.487 74.5231 253.809 76.9061C246.338 80.7113 232.813 82.095 221.518 74.186L227.74 65.3005C235.216 70.5355 244.368 69.5411 248.886 67.2402C251.124 66.0999 252.135 64.7104 252.71 63.2435C253.368 61.5664 253.559 59.5136 253.559 56.9492V56.2712C251.525 58.3051 248.136 61.017 240 61.017ZM229.83 37.9662C229.83 31.1865 235.528 25.7628 242.308 25.7628C249.087 25.7628 254.237 31.1865 254.237 37.9662C254.237 44.7459 248.814 50.1696 242.034 50.1696C235.254 50.1696 229.83 44.7459 229.83 37.9662Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M268.475 37.9661C268.475 50.6967 278.795 61.017 291.525 61.017C293.176 61.0173 302.398 61.0191 310.044 54.2231L302.837 46.1156C298.333 50.1198 292.681 50.1695 291.525 50.1695C286.507 50.1695 282.238 46.7736 280.656 42.0339H314.218C314.454 40.7135 314.576 39.3541 314.576 37.9661C314.576 25.2355 304.256 14.9153 291.525 14.9153C278.795 14.9153 268.475 25.2355 268.475 37.9661ZM302.395 33.8983C300.813 29.1585 296.544 25.7627 291.525 25.7627C286.507 25.7627 282.238 29.1585 280.656 33.8983H302.395Z" fill="white"/>
+      <circle cx="332.76" cy="51" r="10" fill="#FF6F00"/>
+    </svg>
+  </div>
+  <div class="header-right">
+    <span class="header-tag">Internal Review</span>
+    <button class="btn-sessions" id="btn-sessions" onclick="toggleDrawer()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8">
+        <line x1="1" y1="3" x2="11" y2="3"/>
+        <line x1="1" y1="6" x2="11" y2="6"/>
+        <line x1="1" y1="9" x2="11" y2="9"/>
+      </svg>
+      Sessions
+    </button>
+  </div>
+</header>
+
+<!-- ── META BAR ─────────────────────────────────────────────────────────── -->
+<div class="meta-bar" id="meta-bar" style="display:none">
+  <div class="meta-bar-inner">
+    <div class="meta-field">
+      <div class="meta-label">Conversation ID</div>
+      <div class="meta-value mono" id="m-id">—</div>
+    </div>
+    <div class="meta-field">
+      <div class="meta-label">Agent</div>
+      <div class="meta-value" id="m-agent">—</div>
+    </div>
+    <div class="meta-field">
+      <div class="meta-label">Duration</div>
+      <div class="meta-value" id="m-duration">—</div>
+    </div>
+    <div class="meta-field">
+      <div class="meta-label">Analyzed</div>
+      <div class="meta-value" id="m-time">—</div>
+    </div>
+    <div class="meta-field">
+      <div class="meta-label">Model</div>
+      <div class="meta-value mono" style="color:#FF6F00">claude-sonnet-4-6</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOP SUMMARY ROW ───────────────────────────────────────────────────── -->
+<div class="summary-row" id="summary-row">
+  <div class="summary-cell">
+    <div class="summary-label">Diligence Suggestion</div>
+    <div class="summary-value">
+      <span class="summary-dot" id="sum-diligence-dot"></span>
+      <span id="sum-diligence-text">—</span>
+    </div>
+  </div>
+  <div class="summary-cell">
+    <div class="summary-label">Reviewer Confidence</div>
+    <div class="summary-value" id="sum-confidence">—</div>
+  </div>
+  <div class="summary-cell">
+    <div class="summary-label">Follow-up Status</div>
+    <div class="summary-value" id="sum-followup">—</div>
+  </div>
+  <div class="summary-cell">
+    <div class="summary-label">Main Concerns</div>
+    <div class="summary-concerns" id="sum-concerns"></div>
+  </div>
+</div>
+
+<!-- ── PROCESSING STATE ─────────────────────────────────────────────────── -->
+<div id="state-processing" style="display:flex">
+  <div class="proc-orb">
+    <div class="proc-spinner"></div>
+    <div class="proc-dot"></div>
+  </div>
+  <div>
+    <div class="proc-title">Interview complete.</div>
+    <div class="proc-sub">We are processing your assessment now.</div>
+  </div>
+  <div class="proc-steps">
+    <div class="pstep active" id="ps-fetch">
+      <div class="pstep-dot"></div>Waiting for ElevenLabs to finish transcribing
+    </div>
+    <div class="pstep" id="ps-analyze">
+      <div class="pstep-dot"></div>Running assessment analysis
+    </div>
+    <div class="pstep" id="ps-render">
+      <div class="pstep-dot"></div>Preparing reviewer output
+    </div>
+  </div>
+  <div id="ps-status" style="font-size:11px;color:var(--dim);margin-top:4px;font-style:italic;min-height:16px"></div>
+</div>
+
+<!-- ── ERROR STATE ──────────────────────────────────────────────────────── -->
+<div id="state-error">
+  <div class="error-title">Processing failed</div>
+  <div class="error-msg" id="error-msg">An unexpected error occurred.</div>
+  <button onclick="location.href='/interview.html'" style="margin-top:16px;font-family:inherit;font-size:12px;font-weight:600;padding:10px 20px;border:1px solid #e5e3de;border-radius:5px;background:#fff;cursor:pointer;color:#2b3437;">
+    Return to interview
+  </button>
+</div>
+
+<!-- ── RESULTS ───────────────────────────────────────────────────────────── -->
+<div id="state-results">
+  <div class="content-grid">
+
+    <!-- LEFT: TRANSCRIPT -->
+    <div class="transcript-panel">
+      <div class="panel-label">
+        Interview Transcript
+        <span class="turn-count-label" id="turn-count-label">0 turns</span>
+      </div>
+      <div id="transcript-list"></div>
+      <div class="annotation-key" id="ann-key" style="display:none">
+        <div class="ann-item"><div class="ann-bar" style="background:var(--red)"></div>Contradiction</div>
+        <div class="ann-item"><div class="ann-bar" style="background:var(--amber)"></div>Weak / vague</div>
+        <div class="ann-item"><div class="ann-bar" style="background:var(--dim)"></div>Unresolved</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: ANALYSIS -->
+    <div class="analysis-panel fadein">
+
+      <!-- Executive summary -->
+      <div class="exec-summary">
+        <div class="exec-label">Executive Summary</div>
+        <div class="exec-text" id="exec-text">—</div>
+      </div>
+
+      <!-- Dimensions -->
+      <div class="dimensions-label">Assessment — 11 Dimensions</div>
+      <div class="dimension-list" id="dimension-list"></div>
+
+      <!-- Risk Assessment block -->
+      <div class="risk-block" id="risk-block">
+        <div class="risk-block-header">
+          <span class="risk-block-label">Risk Assessment</span>
+          <span class="risk-level-label" id="risk-level-label">—</span>
+        </div>
+        <div class="risk-bar-track">
+          <div class="risk-bar-fill" id="risk-bar-fill"></div>
+        </div>
+        <div class="risk-sub-label">Financial Integrity</div>
+      </div>
+
+      <!-- Flags -->
+      <div class="flags-grid">
+        <div class="flags-block">
+          <div class="flags-title red">
+            <span style="font-size:10px">▲</span> Red Flags
+          </div>
+          <div id="flags-list"></div>
+        </div>
+        <div class="flags-block">
+          <div class="flags-title neutral">
+            <span style="font-size:10px">–</span> Missing Information
+          </div>
+          <div id="missing-list"></div>
+        </div>
+      </div>
+
+      <!-- Confidence -->
+      <div class="confidence-block">
+        <div class="confidence-left">
+          <div class="confidence-title">Reviewer Confidence</div>
+          <div class="confidence-bar-track">
+            <div class="confidence-bar-fill" id="conf-bar" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="confidence-value" id="conf-value">—</div>
+        <div class="confidence-note" id="conf-note"></div>
+      </div>
+
+      <!-- Reviewer note -->
+      <div class="reviewer-note" id="reviewer-note">—</div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── ACTION BAR ────────────────────────────────────────────────────────── -->
+<div class="action-bar" id="action-bar">
+  <div class="action-status">
+    <span class="action-status-dot"></span>
+    Review Status: <span style="color:var(--text);margin-left:4px">Pending</span>
+  </div>
+  <div class="action-btns">
+    <button class="action-btn btn-followup">Follow-Up Needed</button>
+    <button class="action-btn btn-clear">Clear for Review</button>
+    <button class="action-btn btn-escalate">Escalate</button>
+  </div>
+</div>
+
+<script>
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function show(id)  { document.getElementById(id).style.display = 'flex'; }
+function hide(id)  { document.getElementById(id).style.display = 'none'; }
+function block(id) { document.getElementById(id).style.display = 'block'; }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Sessions drawer ───────────────────────────────────────────────────────────
+
+let drawerLoaded = false;
+
+function openDrawer() {
+  document.getElementById('sessions-drawer').classList.add('open');
+  document.getElementById('drawer-backdrop').classList.add('open');
+  if (!drawerLoaded) loadDrawer();
+}
+
+function closeDrawer() {
+  document.getElementById('sessions-drawer').classList.remove('open');
+  document.getElementById('drawer-backdrop').classList.remove('open');
+}
+
+function toggleDrawer() {
+  const drawer = document.getElementById('sessions-drawer');
+  if (drawer.classList.contains('open')) {
+    closeDrawer();
+  } else {
+    openDrawer();
+  }
+}
+
+async function loadDrawer() {
+  drawerLoaded = true;
+  const body = document.getElementById('drawer-body');
+  body.innerHTML = '<div class="drawer-loading">Loading sessions…</div>';
+
+  try {
+    const res = await fetch('/api/conversations');
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || 'Failed to load');
+
+    const convs = data.conversations || [];
+    if (convs.length === 0) {
+      body.innerHTML = '<div class="drawer-empty">No sessions found.</div>';
+      return;
+    }
+
+    const currentId = new URLSearchParams(window.location.search).get('id') || '';
+
+    body.innerHTML = convs.map(c => {
+      const shortId = c.conversation_id ? c.conversation_id.slice(-8) : '—';
+      const date    = c.start_time_unix_secs
+        ? formatSessionDate(c.start_time_unix_secs)
+        : '—';
+      const dur     = c.duration_secs != null
+        ? formatDuration(c.duration_secs)
+        : '';
+      const isCurrent = c.conversation_id && currentId.includes(c.conversation_id);
+      return `<a class="session-row${isCurrent ? ' current' : ''}" href="/review.html?id=${c.conversation_id}&auto=1">
+        <span class="session-id">…${shortId}</span>
+        <span class="session-meta">
+          <span class="session-date">${date}</span>
+          ${dur ? `<span class="session-dot"></span><span class="session-dur">${dur}</span>` : ''}
+        </span>
+      </a>`;
+    }).join('');
+  } catch (err) {
+    body.innerHTML = `<div class="drawer-error">Could not load sessions:<br>${err.message}</div>`;
+  }
+}
+
+function formatSessionDate(unixSecs) {
+  const d = new Date(unixSecs * 1000);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const mon  = months[d.getMonth()];
+  const day  = d.getDate();
+  const h    = String(d.getHours()).padStart(2,'0');
+  const m    = String(d.getMinutes()).padStart(2,'0');
+  return `${mon} ${day} · ${h}:${m}`;
+}
+
+function formatDuration(secs) {
+  if (!secs) return '';
+  const m = Math.round(secs / 60);
+  return m < 1 ? `${secs}s` : `${m}m`;
+}
+
+// ── Processing steps ──────────────────────────────────────────────────────────
+
+function procStep(id) {
+  const steps = ['ps-fetch','ps-analyze','ps-render'];
+  const idx = steps.indexOf(id);
+  steps.forEach((s, i) => {
+    const el = document.getElementById(s);
+    el.className = 'pstep ' + (i < idx ? 'done' : i === idx ? 'active' : '');
+  });
+}
+
+// ── Quality rendering ─────────────────────────────────────────────────────────
+
+function qualityMark(quality) {
+  const q = (quality || 'not_assessed').toLowerCase().replace(' ','_');
+  return `<div class="quality-mark q-${q}">
+    <div class="q-dot"></div>
+    <div class="q-label">${q.replace('_',' ')}</div>
+  </div>`;
+}
+
+// ── Dimension definitions ─────────────────────────────────────────────────────
+
+const DIMS = [
+  { key: 'program_fit',        label: 'Program Fit' },
+  { key: 'job_readiness',      label: 'Job Readiness' },
+  { key: 'grit',               label: 'Grit' },
+  { key: 'education_fit',      label: 'Education Fit' },
+  { key: 'trustworthiness',    label: 'Trustworthiness' },
+  { key: 'financial_resources',label: 'Financial Resources' },
+  { key: 'network_support',    label: 'Network Support' },
+  { key: 'risk_level',         label: 'Risk Level' },
+  { key: 'statement_of_purpose',label:'Statement of Purpose' },
+  { key: 'industry_experience',label: 'Industry Experience' },
+  { key: 'school_grades_quality',label:'School Grades (Back Home)' },
+];
+
+// ── Render dimensions (3-zone row style) ──────────────────────────────────────
+
+function renderDimensions(dimensions) {
+  const list = document.getElementById('dimension-list');
+  list.innerHTML = '';
+
+  DIMS.forEach(({ key, label }) => {
+    const d = dimensions?.[key];
+    if (!d) return;
+
+    const row = document.createElement('div');
+    row.className = 'dim-row';
+
+    // Zone 1: name + source
+    const sourceText = (d.source && d.source !== 'not_assessed')
+      ? d.source.toUpperCase()
+      : 'INTERVIEW';
+
+    // Zone 2: quality indicator
+    let qualityHtml;
+    if (key === 'risk_level') {
+      const lvl = (d.level || 'medium').toLowerCase();
+      qualityHtml = `<span class="risk-badge risk-${lvl}">${lvl}</span>`;
+    } else {
+      qualityHtml = qualityMark(d.quality || 'not_assessed');
+    }
+
+    // Zone 3: rationale
+    const rationale = d.rationale || '';
+
+    row.innerHTML = `
+      <div class="dim-zone-name">
+        <span class="dim-name">${label}</span>
+        <span class="dim-source-tag">${sourceText}</span>
+      </div>
+      <div class="dim-zone-quality">${qualityHtml}</div>
+      <div class="dim-zone-rationale">${rationale}</div>
+    `;
+
+    list.appendChild(row);
+  });
+}
+
+// ── Risk block renderer ───────────────────────────────────────────────────────
+
+function renderRiskBlock(riskDim) {
+  const lvl = (riskDim?.level || 'medium').toLowerCase();
+  const labelMap = { high: 'Elevated', medium: 'Moderate', low: 'Low' };
+  const label = labelMap[lvl] || 'Moderate';
+
+  const labelEl = document.getElementById('risk-level-label');
+  labelEl.textContent = label;
+  labelEl.className = `risk-level-label ${lvl}`;
+
+  const fill = document.getElementById('risk-bar-fill');
+  fill.className = `risk-bar-fill ${lvl}`;
+  // Animate bar width after a tick so CSS transition fires
+  fill.style.width = '0%';
+  const widths = { high: '75%', medium: '50%', low: '25%' };
+  setTimeout(() => { fill.style.width = widths[lvl] || '50%'; }, 100);
+}
+
+// ── Top summary row renderer ──────────────────────────────────────────────────
+
+function renderSummaryRow(analysis) {
+  const riskLevel = (analysis.dimensions?.risk_level?.level || 'medium').toLowerCase();
+  const confLevel = (analysis.reviewer_confidence || 'medium').toLowerCase();
+  const redFlags  = analysis.red_flags || [];
+
+  // Diligence suggestion
+  const diligenceMap = {
+    high:   { text: 'Requires Second Look', dotClass: 'red' },
+    medium: { text: 'Standard Review',      dotClass: 'amber' },
+    low:    { text: 'Clear',                dotClass: 'green' },
+  };
+  const diligence = diligenceMap[riskLevel] || diligenceMap.medium;
+  document.getElementById('sum-diligence-dot').className = `summary-dot ${diligence.dotClass}`;
+  document.getElementById('sum-diligence-text').textContent = diligence.text;
+
+  // Reviewer confidence as percentage
+  const confPctMap = { low: '28%', medium: '62%', high: '90%' };
+  document.getElementById('sum-confidence').textContent = confPctMap[confLevel] || '62%';
+
+  // Follow-up status
+  const needsFollowup = riskLevel === 'high' || redFlags.length > 0;
+  document.getElementById('sum-followup').textContent = needsFollowup
+    ? 'Follow-up Recommended'
+    : 'Clear for Review';
+
+  // Main concerns (first 2 red flags)
+  const concernsEl = document.getElementById('sum-concerns');
+  const topFlags = redFlags.slice(0, 2);
+  if (topFlags.length === 0) {
+    concernsEl.innerHTML = '<span style="font-size:10.5px;color:var(--dim);font-style:italic">None identified</span>';
+  } else {
+    concernsEl.innerHTML = topFlags
+      .map(f => `<span class="summary-concern-item">${f}</span>`)
+      .join('');
+  }
+
+  document.getElementById('summary-row').classList.add('visible');
+}
+
+// ── Transcript rendering + annotation ────────────────────────────────────────
+
+function renderTranscript(turns, redFlags, missingInfo) {
+  const list = document.getElementById('transcript-list');
+  list.innerHTML = '';
+
+  // Build keyword sets for annotation
+  const flagWords = (redFlags || []).join(' ').toLowerCase();
+  const missingWords = (missingInfo || []).join(' ').toLowerCase();
+
+  const CONTRADICTION_SIGNALS = ['contradict','inconsist','shift','change','differ','first say','initially','earlier'];
+  const WEAK_SIGNALS = ['vague','unclear','not confirm','no detail','generic','surface','shallow','no backup'];
+  const MISSING_SIGNALS = ['unconfirm','not provided','never','no mention','not address','not ask'];
+
+  let hasAnnotations = false;
+
+  turns.forEach(({ role, text, ts }) => {
+    const isAgent = role === 'agent';
+    const lc = text.toLowerCase();
+
+    // Annotation: only annotate student turns
+    let flagClass = '';
+    if (!isAgent) {
+      const inFlags  = flagWords && CONTRADICTION_SIGNALS.some(w => flagWords.includes(w) && (flagWords.includes(lc.slice(0,20)) || lc.length < 60));
+      // Simple heuristic: flag short/vague student answers in financial section
+      const isVague  = lc.split(' ').length < 5 && ts !== '0:00';
+      const inMissing = missingWords && MISSING_SIGNALS.some(w => missingWords.includes(w));
+
+      // Check if this turn's text is referenced in any flag
+      const turnWords = lc.split(/\s+/).filter(w => w.length > 4);
+      const flagRef   = (redFlags || []).some(f => turnWords.some(w => f.toLowerCase().includes(w)));
+      const missRef   = (missingInfo || []).some(f => turnWords.some(w => f.toLowerCase().includes(w)));
+
+      if (flagRef)        { flagClass = 'flag-contradiction'; hasAnnotations = true; }
+      else if (isVague)   { flagClass = 'flag-weak';          hasAnnotations = true; }
+      else if (missRef)   { flagClass = 'flag-missing';       hasAnnotations = true; }
+    }
+
+    const div = document.createElement('div');
+    div.className = `turn ${flagClass}`.trim();
+    div.innerHTML = `
+      <div class="turn-header">
+        <span class="speaker ${isAgent ? 'ella' : 'student'}">${isAgent ? 'Ella' : 'Student'}</span>
+        <span class="turn-ts">${ts}</span>
+      </div>
+      <div class="turn-body ${isAgent ? 'ella-body' : ''}">"${text}"</div>
+    `;
+    list.appendChild(div);
+  });
+
+  document.getElementById('turn-count-label').textContent = `${turns.length} turns`;
+  if (hasAnnotations) block('ann-key');
+}
+
+// ── Render flags ──────────────────────────────────────────────────────────────
+
+function renderFlags(flags, containerId, glyphClass) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  if (!flags || flags.length === 0) {
+    el.innerHTML = `<div class="flag-item"><span class="${glyphClass}" style="opacity:0.4">—</span><span style="color:var(--dim);font-style:italic;font-size:11px">None identified</span></div>`;
+    return;
+  }
+  flags.forEach(f => {
+    el.innerHTML += `<div class="flag-item"><span class="${glyphClass}">!</span><span>${f}</span></div>`;
+  });
+}
+
+function renderMissing(items) {
+  const el = document.getElementById('missing-list');
+  el.innerHTML = '';
+  if (!items || items.length === 0) {
+    el.innerHTML = `<div class="flag-item"><span class="missing-glyph" style="opacity:0.4">—</span><span style="color:var(--dim);font-style:italic;font-size:11px">None identified</span></div>`;
+    return;
+  }
+  items.forEach(m => {
+    el.innerHTML += `<div class="flag-item"><span class="missing-glyph">–</span><span>${m}</span></div>`;
+  });
+}
+
+// ── Confidence bar ────────────────────────────────────────────────────────────
+
+function renderConfidence(level, note) {
+  const map = { low: { pct: 28, label: 'Low' }, medium: { pct: 62, label: 'Medium' }, high: { pct: 90, label: 'High' } };
+  const c = map[(level || 'medium').toLowerCase()] || map.medium;
+  document.getElementById('conf-value').textContent = c.label;
+  document.getElementById('conf-note').textContent  = note || 'Based on interview transcript only.';
+  setTimeout(() => {
+    document.getElementById('conf-bar').style.width = c.pct + '%';
+  }, 200);
+}
+
+// ── Render all results ────────────────────────────────────────────────────────
+
+function renderResults(data) {
+  const { meta, transcript, analysis } = data;
+
+  // Meta bar
+  document.getElementById('m-id').textContent       = meta.conversation_id;
+  document.getElementById('m-agent').textContent    = meta.agent_name;
+  document.getElementById('m-duration').textContent = meta.duration_secs ? `${meta.duration_secs}s` : '—';
+  document.getElementById('m-time').textContent     = new Date(meta.analyzed_at).toLocaleTimeString();
+  document.getElementById('meta-bar').style.display = 'block';
+
+  // Executive summary
+  document.getElementById('exec-text').textContent = analysis.executive_summary || '—';
+
+  // Dimensions
+  renderDimensions(analysis.dimensions);
+
+  // Risk block
+  renderRiskBlock(analysis.dimensions?.risk_level);
+
+  // Flags
+  renderFlags(analysis.red_flags, 'flags-list', 'flag-glyph');
+  renderMissing(analysis.missing_information);
+
+  // Confidence
+  renderConfidence(analysis.reviewer_confidence, null);
+
+  // Reviewer note
+  document.getElementById('reviewer-note').textContent = analysis.reviewer_note || '—';
+
+  // Transcript
+  renderTranscript(transcript, analysis.red_flags, analysis.missing_information);
+
+  // Top summary row
+  renderSummaryRow(analysis);
+
+  // Show results
+  hide('state-processing');
+  block('state-results');
+  document.getElementById('action-bar').style.display = 'flex';
+}
+
+// ── Main: auto-process from URL ───────────────────────────────────────────────
+
+async function run() {
+  const params = new URLSearchParams(window.location.search);
+  const convId = (params.get('id') || '').trim().replace(/.*?(conv_[a-zA-Z0-9]+).*/, '$1');
+
+  console.log('[review] Captured conversation ID from URL:', convId || '(none)');
+
+  if (!convId) {
+    hide('state-processing');
+    show('state-error');
+    document.getElementById('error-msg').textContent = 'No conversation ID in URL. Return to the interview page.';
+    return;
+  }
+
+  // Step 1 — waiting for transcript
+  procStep('ps-fetch');
+  const statusEl = document.getElementById('ps-status');
+  statusEl.textContent = 'This may take up to 40 seconds while ElevenLabs processes the audio…';
+
+  // Step 2 — Claude analysis (server handles retry internally, this is a long request)
+  procStep('ps-analyze');
+
+  let data;
+  try {
+    const res = await fetch('/api/process-interview-passage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ conversationId: convId }),
+    });
+    data = await res.json();
+
+    // Debug: always log what came back
+    console.log('[review] API response:', {
+      conversationId: data?.meta?.conversation_id,
+      transcriptTurns: data?.transcript?.length ?? 0,
+      studentTurns: data?.transcript?.filter(t => t.role === 'student').length ?? 0,
+      debug: data?.debug,
+      error: data?.error,
+    });
+
+    if (!res.ok || data.error) throw new Error(data.error || 'Unknown error');
+  } catch (err) {
+    console.error('[review] Processing failed:', err.message);
+    hide('state-processing');
+    show('state-error');
+    document.getElementById('error-msg').textContent = err.message;
+    return;
+  }
+
+  // Hard validation before rendering
+  const studentTurns = (data.transcript || []).filter(t => t.role === 'student');
+  if (studentTurns.length === 0) {
+    console.error('[review] Transcript has no student turns — refusing to render empty assessment.');
+    hide('state-processing');
+    show('state-error');
+    document.getElementById('error-msg').textContent =
+      `Transcript returned ${data.transcript?.length ?? 0} total turns but 0 student responses. ` +
+      `The interview session may not have recorded correctly. Check the console for details.`;
+    return;
+  }
+
+  // Step 3
+  procStep('ps-render');
+  statusEl.textContent = '';
+  await sleep(400);
+
+  renderResults(data);
+}
+
+run();
+</script>
+</body>
+</html>

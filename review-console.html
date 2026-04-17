@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ella Interview Review Console</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0f1117;
+      --surface:     #161b27;
+      --surface-2:   #1d2435;
+      --border:      #252d3f;
+      --border-soft: #1e2538;
+      --text:        #e2e8f0;
+      --text-muted:  #7a8499;
+      --text-dim:    #4a5368;
+      --accent:      #4f7cff;
+      --accent-dim:  #2a3f7a;
+      --green:       #34d399;
+      --green-dim:   #0d3327;
+      --yellow:      #fbbf24;
+      --yellow-dim:  #3d2e08;
+      --red:         #f87171;
+      --red-dim:     #3b1414;
+      --orange:      #fb923c;
+      --orange-dim:  #3b1f0a;
+      --radius:      6px;
+      --radius-lg:   10px;
+      --mono:        'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --sans:        -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    html { font-size: 14px; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ──────────────────────────────────────────────────────── */
+
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 28px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 7px;
+    }
+
+    .header-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--yellow-dim);
+      color: var(--yellow);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--yellow);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      margin-top: 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .meta-item {
+      padding: 10px 18px;
+      border-right: 1px solid var(--border);
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .meta-item:last-child { border-right: none; }
+
+    .meta-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 3px;
+    }
+
+    .meta-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      font-family: var(--mono);
+    }
+
+    /* ── MAIN LAYOUT ─────────────────────────────────────────────────── */
+
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      height: calc(100vh - 130px);
+    }
+
+    .panel {
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .panel::-webkit-scrollbar { width: 5px; }
+    .panel::-webkit-scrollbar-track { background: transparent; }
+    .panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .panel-left {
+      border-right: 1px solid var(--border);
+      padding: 24px 28px;
+    }
+
+    .panel-right {
+      padding: 24px 28px;
+      background: var(--bg);
+    }
+
+    .panel-heading {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-soft);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .turn-count {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-dim);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 2px 8px;
+    }
+
+    /* ── TRANSCRIPT ──────────────────────────────────────────────────── */
+
+    .transcript { display: flex; flex-direction: column; gap: 3px; }
+
+    .turn {
+      display: grid;
+      grid-template-columns: 68px 1fr;
+      gap: 0;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-soft);
+      align-items: start;
+    }
+
+    .turn:last-child { border-bottom: none; }
+
+    .turn-meta {
+      padding-top: 1px;
+    }
+
+    .speaker-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .speaker-agent {
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .speaker-student {
+      color: var(--green);
+      background: var(--green-dim);
+    }
+
+    .turn-timestamp {
+      font-size: 9px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      margin-top: 4px;
+      display: block;
+    }
+
+    .turn-text {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text);
+      padding: 2px 0;
+    }
+
+    .turn-text.agent-text { color: #a8b8d8; }
+    .turn-text.student-text { color: var(--text); }
+
+    /* ── ANALYSIS ────────────────────────────────────────────────────── */
+
+    .analysis { display: flex; flex-direction: column; gap: 14px; }
+
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-2);
+    }
+
+    .section-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .section-body { padding: 14px 16px; }
+
+    /* Summary */
+    .summary-text {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #c8d4e8;
+    }
+
+    /* Subsections */
+    .subsection-grid { display: flex; flex-direction: column; gap: 10px; }
+
+    .subsection {
+      display: grid;
+      grid-template-columns: 130px 1fr auto;
+      gap: 8px 12px;
+      align-items: start;
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+    }
+
+    .subsection-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding-top: 1px;
+    }
+
+    .subsection-evidence {
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .quality-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 3px;
+      white-space: nowrap;
+      align-self: start;
+      margin-top: 1px;
+    }
+
+    .quality-strong  { background: #0a2e1e; color: var(--green);  border: 1px solid #1a5c3a; }
+    .quality-medium  { background: #2d2608; color: var(--yellow); border: 1px solid #5a4c14; }
+    .quality-weak    { background: #2e1010; color: var(--red);    border: 1px solid #5a1f1f; }
+    .quality-missing { background: #1e1e1e; color: var(--text-dim); border: 1px solid var(--border); }
+
+    /* Flags & Missing */
+    .flag-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .flag-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 9px 12px;
+      border-radius: var(--radius);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+
+    .flag-contradiction {
+      background: var(--red-dim);
+      border: 1px solid rgba(248, 113, 113, 0.15);
+      color: #f5a8a8;
+    }
+
+    .flag-missing {
+      background: #1a1e2e;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .flag-icon { flex-shrink: 0; margin-top: 1px; font-size: 12px; }
+
+    /* Reviewer note */
+    .reviewer-note-text {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text);
+      font-style: italic;
+      padding: 4px 0;
+    }
+
+    /* Final review box */
+    .final-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .final-header {
+      padding: 12px 16px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .final-header-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .decision-pending {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--yellow);
+      background: var(--yellow-dim);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      border-radius: 4px;
+      padding: 3px 9px;
+      letter-spacing: 0.04em;
+    }
+
+    .final-body {
+      padding: 14px 16px;
+    }
+
+    .final-note {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      border: 1px solid;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: opacity 0.15s ease;
+      font-family: var(--sans);
+    }
+
+    .btn:hover { opacity: 0.8; }
+
+    .btn-followup {
+      background: var(--yellow-dim);
+      color: var(--yellow);
+      border-color: rgba(251, 191, 36, 0.25);
+    }
+
+    .btn-clear {
+      background: var(--green-dim);
+      color: var(--green);
+      border-color: rgba(52, 211, 153, 0.25);
+    }
+
+    .btn-escalate {
+      background: var(--red-dim);
+      color: var(--red);
+      border-color: rgba(248, 113, 113, 0.25);
+    }
+
+    .reviewer-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 12.5px;
+      color: var(--text);
+      font-family: var(--sans);
+      resize: vertical;
+      min-height: 72px;
+      margin-bottom: 12px;
+      line-height: 1.6;
+      transition: border-color 0.15s ease;
+    }
+
+    .reviewer-input::placeholder { color: var(--text-dim); }
+    .reviewer-input:focus { outline: none; border-color: var(--accent-dim); }
+
+    /* ── SECTION COLOR VARIANTS ──────────────────────────────────────── */
+
+    .icon-summary   { background: #1a2040; color: var(--accent); }
+    .icon-fit       { background: #0f2e20; color: var(--green); }
+    .icon-financial { background: #2d2608; color: var(--yellow); }
+    .icon-flags     { background: #2e1010; color: var(--red); }
+    .icon-missing   { background: #1e1e2e; color: var(--text-muted); }
+    .icon-note      { background: #1a1a2e; color: #c084fc; }
+
+    .title-summary   { color: var(--accent); }
+    .title-fit       { color: var(--green); }
+    .title-financial { color: var(--yellow); }
+    .title-flags     { color: var(--red); }
+    .title-missing   { color: var(--text-muted); }
+    .title-note      { color: #c084fc; }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────────────── */
+
+    @media (max-width: 900px) {
+      .main {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      .panel-left {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        max-height: 60vh;
+      }
+      .meta-item { min-width: 120px; }
+    }
+
+    @media (max-width: 600px) {
+      .subsection { grid-template-columns: 1fr; }
+      .quality-badge { justify-self: start; }
+      .header { padding: 14px 16px; }
+      .panel-left, .panel-right { padding: 18px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-top">
+    <div class="header-brand">
+      <span class="brand-badge">Internal</span>
+      <span class="header-title">Ella Interview Review Console</span>
+    </div>
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      Pending Review
+    </div>
+  </div>
+
+  <div class="header-meta">
+    <div class="meta-item">
+      <div class="meta-label">Applicant</div>
+      <div class="meta-value">Test Applicant 04</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Conversation ID</div>
+      <div class="meta-value">conv_9k2xv8mq41</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Interview Date</div>
+      <div class="meta-value">2026-04-15 &nbsp;14:32 UTC</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Agent Version</div>
+      <div class="meta-value">ella-v1.4.2</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Prompt Version</div>
+      <div class="meta-value">prompt-fin-v3</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Analysis Status</div>
+      <div class="meta-value" style="color: var(--green);">Complete</div>
+    </div>
+  </div>
+</header>
+
+<!-- ── MAIN ───────────────────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- LEFT: RAW TRANSCRIPT -->
+  <div class="panel panel-left">
+    <div class="panel-heading">
+      Raw Transcript
+      <span class="turn-count">14 turns</span>
+    </div>
+
+    <div class="transcript">
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">00:00</span>
+        </div>
+        <div class="turn-text agent-text">Hey, I'll ask you a few simple questions to better understand your program fit and financial situation. Just answer as clearly as you can. Let's get started.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">00:07</span>
+        </div>
+        <div class="turn-text student-text">Get started.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">00:09</span>
+        </div>
+        <div class="turn-text agent-text">What made you choose this program?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">00:12</span>
+        </div>
+        <div class="turn-text student-text">I just love engineering really, always my passion.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">00:17</span>
+        </div>
+        <div class="turn-text agent-text">Can you tell me a little more about what you love about engineering?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">00:22</span>
+        </div>
+        <div class="turn-text student-text">It is hands on, many examples, I like coding and building.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">00:29</span>
+        </div>
+        <div class="turn-text agent-text">In your own words, what do you think this program will teach you?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">00:34</span>
+        </div>
+        <div class="turn-text student-text">I think it teach me how to write code and be a good engineer.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">00:42</span>
+        </div>
+        <div class="turn-text agent-text">If the program becomes harder than expected and you fall behind, what would you do first?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">00:51</span>
+        </div>
+        <div class="turn-text student-text">I would manage my stress and try to get it done.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">00:58</span>
+        </div>
+        <div class="turn-text agent-text">What kind of job do you hope to get after this program?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">01:04</span>
+        </div>
+        <div class="turn-text student-text">I think it is a good fit to my studies, I will become an engineer.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">01:14</span>
+        </div>
+        <div class="turn-text agent-text">What in your past study or experience may help you succeed here?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">01:21</span>
+        </div>
+        <div class="turn-text student-text">I studied math and physics and that is the foundation.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">01:29</span>
+        </div>
+        <div class="turn-text agent-text">Do you have savings or family support for school?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">01:34</span>
+        </div>
+        <div class="turn-text student-text">I do, five thousand CAD, parents.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">01:40</span>
+        </div>
+        <div class="turn-text agent-text">Is that your own money or family support?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">01:44</span>
+        </div>
+        <div class="turn-text student-text">Family support.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">01:48</span>
+        </div>
+        <div class="turn-text agent-text">Do you currently have any debt?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">01:52</span>
+        </div>
+        <div class="turn-text student-text">Not really.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">01:56</span>
+        </div>
+        <div class="turn-text agent-text">Who will help with the cash collateral?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">02:01</span>
+        </div>
+        <div class="turn-text student-text">Parents.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">02:05</span>
+        </div>
+        <div class="turn-text agent-text">Do you already have a plan for monthly payments?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">02:11</span>
+        </div>
+        <div class="turn-text student-text">I do, yeah, it is three hundred a month.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">02:19</span>
+        </div>
+        <div class="turn-text agent-text">Is the money for school mainly your own, family support, or both?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">02:25</span>
+        </div>
+        <div class="turn-text student-text">Both.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">02:29</span>
+        </div>
+        <div class="turn-text agent-text">If someone helps with the cash collateral, will you need to pay it back later?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">02:36</span>
+        </div>
+        <div class="turn-text student-text">Yes.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">02:40</span>
+        </div>
+        <div class="turn-text agent-text">When do you expect to start this program?</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-student">Student</span>
+          <span class="turn-timestamp">02:45</span>
+        </div>
+        <div class="turn-text student-text">September 2026, and I will study hard and pay loan.</div>
+      </div>
+
+      <div class="turn">
+        <div class="turn-meta">
+          <span class="speaker-label speaker-agent">Agent</span>
+          <span class="turn-timestamp">02:54</span>
+        </div>
+        <div class="turn-text agent-text">Thank you. This interview is complete. Your responses will be shared with the finance team.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: CLAUDE ANALYSIS -->
+  <div class="panel panel-right">
+    <div class="panel-heading">
+      Claude Analysis
+      <span class="turn-count">claude-sonnet-4-6</span>
+    </div>
+
+    <div class="analysis">
+
+      <!-- 1. CLEAN SUMMARY -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-icon icon-summary">&#9632;</div>
+          <span class="section-title title-summary">Clean Summary</span>
+        </div>
+        <div class="section-body">
+          <p class="summary-text">The student says they chose engineering because they enjoy hands-on work, coding, and building. They believe the program will teach coding and help them become an engineer. They mentioned prior study in math and physics. Financially, they mention family support — about five thousand CAD from parents — no clear debt answer, parents helping with cash collateral, and a monthly payment plan of three hundred CAD.</p>
+        </div>
+      </div>
+
+      <!-- 2. PROGRAM FIT -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-icon icon-fit">&#9632;</div>
+          <span class="section-title title-fit">Program Fit</span>
+        </div>
+        <div class="section-body">
+          <div class="subsection-grid">
+            <div class="subsection">
+              <div class="subsection-label">Motivation</div>
+              <div class="subsection-evidence">Enjoys engineering, coding, and building. Describes hands-on appeal but no specific connection to this program's structure or outcomes.</div>
+              <div class="quality-badge quality-medium">Medium</div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-label">Program understanding</div>
+              <div class="subsection-evidence">Says the program will teach coding and help become an engineer. No mention of curriculum specifics, duration, or expected learning outcomes.</div>
+              <div class="quality-badge quality-weak">Weak</div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-label">Education relevance</div>
+              <div class="subsection-evidence">Math and physics background cited as the foundation. No further detail on level, institution, or how it connects to technical readiness.</div>
+              <div class="quality-badge quality-medium">Medium</div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-label">Work relevance</div>
+              <div class="subsection-evidence">No work or practical experience provided. Question about past experience was answered only with academic subjects.</div>
+              <div class="quality-badge quality-missing">Missing</div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-label">Resilience response</div>
+              <div class="subsection-evidence">Says they would manage stress and try to get the work done. No concrete strategy, support system, or prior adversity example given.</div>
+              <div class="quality-badge quality-weak">Weak</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. FINANCIAL RESOURCES -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-icon icon-financial">&#9632;</div>
+          <span class="section-title title-financial">Financial Resources</span>
+        </div>
+        <div class="section-body">
+          <div class="subsection-grid">
+            <div class="subsection">
+              <div class="subsection-label">Funding source</div>
+              <div class="subsection-evidence">Initially says family support. Later says both when asked more directly. The shift is unexplained and raises a consistency concern.</div>
+              <div class="quality-badge quality-weak">Weak</div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-label">Savings or family support</div>
+              <div class="subsection-evidence">Mentions five thousand CAD from parents. Amount is specific but the nature of the support — gift, loan, contribution — is unconfirmed.</div>
+              <div class="quality-badge quality-medium">Medium</div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-label">Debt status</div>
+              <div class="subsection-evidence">Says "not really" when asked about debt. This is not a clear denial. No follow-up clarification was captured in the transcript.</div>
+              <div class="quality-badge quality-weak">Weak</div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-label">Cash collateral source</div>
+              <div class="subsection-evidence">Parents will help with cash collateral. However student confirms this money will need to be paid back, making it a loan obligation, not collateral in the traditional sense.</div>
+              <div class="quality-badge quality-medium">Medium</div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-label">Monthly payment plan</div>
+              <div class="subsection-evidence">Three hundred CAD per month stated. Who is responsible for the payment — student, parents, or both — is not confirmed.</div>
+              <div class="quality-badge quality-medium">Medium</div>
+            </div>
+            <div class="subsection">
+              <div class="subsection-label">Backup plan</div>
+              <div class="subsection-evidence">No backup plan mentioned. No alternative funding source, emergency savings, or contingency discussed at any point.</div>
+              <div class="quality-badge quality-missing">Missing</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. CONTRADICTION FLAGS -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-icon icon-flags">&#9650;</div>
+          <span class="section-title title-flags">Contradiction Flags</span>
+        </div>
+        <div class="section-body">
+          <div class="flag-list">
+            <div class="flag-item flag-contradiction">
+              <span class="flag-icon">&#9650;</span>
+              <span>Funding source is inconsistent — student first says family support only, then says both when asked again. No explanation for the shift.</span>
+            </div>
+            <div class="flag-item flag-contradiction">
+              <span class="flag-icon">&#9650;</span>
+              <span>Cash collateral may not function as true collateral — student confirms it will need to be repaid, meaning it may be an informal loan rather than a parental gift or pledge.</span>
+            </div>
+            <div class="flag-item flag-contradiction">
+              <span class="flag-icon">&#9650;</span>
+              <span>Debt status is ambiguous — "not really" is not a clear no. Could indicate minor debt, uncertainty, or evasion. Requires direct confirmation.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. MISSING INFORMATION -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-icon icon-missing">&#9675;</div>
+          <span class="section-title title-missing">Missing Information</span>
+        </div>
+        <div class="section-body">
+          <div class="flag-list">
+            <div class="flag-item flag-missing">
+              <span class="flag-icon">&#8212;</span>
+              <span>No strong explanation of what the program specifically teaches. Student answered at a generic level only.</span>
+            </div>
+            <div class="flag-item flag-missing">
+              <span class="flag-icon">&#8212;</span>
+              <span>No work or practical experience provided. The gap between academic background and readiness is unaddressed.</span>
+            </div>
+            <div class="flag-item flag-missing">
+              <span class="flag-icon">&#8212;</span>
+              <span>No backup financial plan. What happens if parents cannot follow through is entirely unaddressed.</span>
+            </div>
+            <div class="flag-item flag-missing">
+              <span class="flag-icon">&#8212;</span>
+              <span>Debt status was never clearly resolved. The "not really" response was not followed up in the interview.</span>
+            </div>
+            <div class="flag-item flag-missing">
+              <span class="flag-icon">&#8212;</span>
+              <span>Who is responsible for the monthly payment of three hundred CAD — the student personally, parents, or both — was not confirmed.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. REVIEWER NOTE -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-icon icon-note">&#9632;</div>
+          <span class="section-title title-note">Reviewer Note</span>
+        </div>
+        <div class="section-body">
+          <p class="reviewer-note-text">Program fit appears genuine but shallow — motivation is present, specific understanding is not. The financial picture is incomplete and partially inconsistent. Human follow-up is needed on debt status, the true nature of the funding source, repayment expectations on the collateral, and who is responsible for monthly payments. Do not approve without resolving the collateral and debt questions directly.</p>
+        </div>
+      </div>
+
+      <!-- 7. FINAL REVIEW BOX -->
+      <div class="final-box">
+        <div class="final-header">
+          <span class="final-header-title">Reviewer Decision</span>
+          <span class="decision-pending">Pending</span>
+        </div>
+        <div class="final-body">
+          <p class="final-note">Add a note and select an outcome below. This record will be logged against the conversation ID.</p>
+          <textarea class="reviewer-input" placeholder="Reviewer notes (optional) — e.g. scheduled follow-up call, requested bank statement, escalated to senior underwriter..."></textarea>
+          <div class="action-buttons">
+            <button class="btn btn-followup">Needs Follow-Up</button>
+            <button class="btn btn-clear">Clear for Review</button>
+            <button class="btn btn-escalate">Escalate</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>

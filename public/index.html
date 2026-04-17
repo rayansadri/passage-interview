@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ella Live Review</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "surface":                "#f8f9fa",
+            "surface-container-low":  "#f1f4f6",
+            "surface-container":      "#eaeff1",
+            "surface-container-high": "#e3e9ec",
+            "surface-container-highest": "#dbe4e7",
+            "surface-container-lowest":  "#ffffff",
+            "on-surface":             "#2b3437",
+            "on-surface-variant":     "#586064",
+            "outline":                "#737c7f",
+            "outline-variant":        "#abb3b7",
+            "primary":                "#5f5e5e",
+            "primary-dim":            "#535252",
+            "on-primary":             "#faf7f6",
+            "secondary":              "#506076",
+            "error":                  "#9e3f4e",
+            "surface-variant":        "#dbe4e7",
+          },
+          fontFamily: { sans: ["Inter", "sans-serif"] },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem" },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    .editorial-shadow { box-shadow: 0 4px 32px rgba(43,52,55,0.05); }
+    .scrollpanel::-webkit-scrollbar { width: 3px; }
+    .scrollpanel::-webkit-scrollbar-thumb { background: #dbe4e7; border-radius: 10px; }
+    .scrollpanel { scrollbar-width: thin; scrollbar-color: #dbe4e7 transparent; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { animation: spin 0.8s linear infinite; }
+    @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .fadein { animation: fadein 0.3s ease forwards; }
+  </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+
+  <!-- HEADER -->
+  <header class="bg-surface border-b border-outline-variant/20 sticky top-0 z-50">
+    <div class="max-w-screen-xl mx-auto px-8 py-4 flex items-center justify-between">
+      <div>
+        <h1 class="text-base font-bold tracking-tight text-primary">Ella Live Review</h1>
+        <p class="text-[10px] uppercase tracking-[0.12em] text-outline font-semibold mt-0.5">Voice interview to reviewer-ready output</p>
+      </div>
+      <div id="meta-row" class="hidden items-center gap-6 text-[11px] text-outline">
+        <span>ID: <span id="meta-id" class="text-on-surface font-medium font-mono"></span></span>
+        <span>Agent: <span id="meta-agent" class="text-on-surface font-medium"></span></span>
+        <span>Duration: <span id="meta-duration" class="text-on-surface font-medium"></span></span>
+        <span>Analyzed: <span id="meta-time" class="text-on-surface font-medium"></span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- PROCESSING BAR -->
+  <div class="bg-surface-container-low border-b border-outline-variant/15">
+    <div class="max-w-screen-xl mx-auto px-8 py-4 flex items-center gap-4">
+      <div class="flex-1 max-w-md bg-surface-container-lowest editorial-shadow rounded-lg flex items-center overflow-hidden border border-outline-variant/20">
+        <input
+          id="conv-input"
+          type="text"
+          placeholder="conv_..."
+          class="flex-1 px-4 py-2.5 bg-transparent text-sm text-on-surface placeholder:text-outline-variant/60 focus:outline-none font-mono"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <button
+        id="process-btn"
+        class="bg-primary text-on-primary px-5 py-2.5 rounded-lg text-[12px] font-bold tracking-wide hover:bg-primary-dim transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <span id="btn-text">Process Interview</span>
+        <svg id="btn-spinner" class="spinner hidden w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      </button>
+      <div id="status" class="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-outline">
+        <span id="status-dot" class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+        <span id="status-text">Ready</span>
+      </div>
+    </div>
+    <div id="error-bar" class="hidden px-8 pb-3">
+      <p id="error-text" class="text-[12px] text-error font-medium"></p>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div id="empty-state" class="max-w-screen-xl mx-auto px-8 py-24 text-center">
+    <p class="text-[13px] text-outline">Paste a conversation ID above and click <strong class="text-on-surface">Process Interview</strong> to begin.</p>
+  </div>
+
+  <!-- MAIN CONTENT (hidden until result) -->
+  <div id="main-content" class="hidden max-w-screen-xl mx-auto px-8 py-8 pb-28 fadein">
+    <div class="grid grid-cols-12 gap-8">
+
+      <!-- LEFT: TRANSCRIPT (5 cols) -->
+      <section class="col-span-5">
+        <div class="sticky top-[105px] bg-surface/90 backdrop-blur-sm py-2 flex items-center justify-between mb-4">
+          <h3 class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">Interview Transcript</h3>
+          <span id="turn-count" class="text-[10px] text-outline-variant"></span>
+        </div>
+        <div id="transcript-list" class="space-y-6 overflow-y-auto scrollpanel max-h-[calc(100vh-220px)] pr-2">
+        </div>
+      </section>
+
+      <!-- RIGHT: ANALYSIS (7 cols) -->
+      <section class="col-span-7 bg-surface-container-low rounded-xl p-8 overflow-y-auto scrollpanel max-h-[calc(100vh-220px)]">
+        <div class="sticky top-0 bg-surface-container-low py-2 flex items-center justify-between mb-6 z-10">
+          <h3 class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline">Reviewer Analysis</h3>
+          <span class="text-[10px] text-outline-variant">claude-sonnet-4-6</span>
+        </div>
+
+        <!-- Summary -->
+        <div class="bg-surface-container-lowest rounded-lg p-6 editorial-shadow mb-8">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-3">Clean Summary</p>
+          <p id="a-summary" class="text-[13.5px] leading-relaxed text-on-surface font-light"></p>
+        </div>
+
+        <!-- Program Fit + Financials grid -->
+        <div class="grid grid-cols-2 gap-6 mb-8">
+
+          <!-- Program Fit -->
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline mb-4">Program Fit</p>
+            <div id="a-fit" class="space-y-4"></div>
+          </div>
+
+          <!-- Financial Resources -->
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-outline mb-4">Financial Resources</p>
+            <div id="a-fin" class="space-y-4"></div>
+          </div>
+
+        </div>
+
+        <!-- Flags + Missing -->
+        <div class="grid grid-cols-2 gap-6 mb-8">
+          <div class="bg-surface-container-lowest/60 rounded-lg p-5">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-error mb-3 flex items-center gap-1.5">
+              <span class="w-1 h-1 rounded-full bg-error inline-block"></span>Contradiction Flags
+            </p>
+            <ul id="a-flags" class="space-y-2.5 text-[11.5px] text-on-surface leading-snug"></ul>
+          </div>
+          <div class="bg-surface-container-lowest/60 rounded-lg p-5">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-3 flex items-center gap-1.5">
+              <span class="w-1 h-1 rounded-full bg-outline-variant inline-block"></span>Missing Information
+            </p>
+            <ul id="a-missing" class="space-y-2.5 text-[11.5px] text-on-surface leading-snug"></ul>
+          </div>
+        </div>
+
+        <!-- Reviewer Note -->
+        <div class="border-t border-outline-variant/10 pt-6">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-2">Reviewer Note</p>
+          <p id="a-note" class="text-[12.5px] leading-relaxed text-on-surface-variant italic"></p>
+        </div>
+
+      </section>
+    </div>
+  </div>
+
+  <!-- FIXED BOTTOM ACTION BAR -->
+  <footer id="action-bar" class="hidden fixed bottom-0 left-0 w-full z-50 bg-surface/85 backdrop-blur-md border-t border-outline-variant/20 editorial-shadow">
+    <div class="max-w-screen-xl mx-auto flex items-center justify-between px-8 py-3 gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+        <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Review Status: <span class="text-on-surface">Pending</span></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-on-surface border border-outline-variant/30 rounded-lg hover:bg-surface-container transition-colors">Follow-Up Needed</button>
+        <button class="px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-on-primary bg-primary hover:bg-primary-dim rounded-lg transition-colors">Clear for Review</button>
+        <button class="px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-error hover:bg-error/5 rounded-lg transition-colors">Escalate</button>
+      </div>
+    </div>
+  </footer>
+
+<script>
+// ── Quality rendering ─────────────────────────────────────────────────────────
+
+const QUALITY_COLORS = {
+  strong:  { dot: "#5f5e5e",  text: "#5f5e5e"  },
+  medium:  { dot: "#506076",  text: "#506076"  },
+  weak:    { dot: "#9e3f4e",  text: "#9e3f4e"  },
+  missing: { dot: "#abb3b7",  text: "#abb3b7"  },
+  unclear: { dot: "#7a6b2e",  text: "#7a6b2e"  },
+};
+
+function qualityDot(q) {
+  const c = QUALITY_COLORS[q] || QUALITY_COLORS.unclear;
+  return `<span style="display:inline-flex;align-items:center;gap:4px;white-space:nowrap">
+    <span style="width:6px;height:6px;border-radius:50%;background:${c.dot};flex-shrink:0;display:inline-block"></span>
+    <span style="font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:${c.text}">${q}</span>
+  </span>`;
+}
+
+function renderFieldRow(label, field) {
+  return `<div class="group">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px">
+      <span class="text-[11px] font-semibold text-on-surface-variant">${label}</span>
+      ${qualityDot(field.quality)}
+    </div>
+    <p class="text-[11px] text-outline leading-snug">${field.evidence}</p>
+    ${field.notes ? `<p class="text-[10.5px] text-outline-variant leading-snug mt-1 italic">${field.notes}</p>` : ""}
+  </div>`;
+}
+
+// ── Transcript rendering ──────────────────────────────────────────────────────
+
+function renderTranscript(turns) {
+  const list = document.getElementById("transcript-list");
+  list.innerHTML = "";
+  turns.forEach(({ role, text, ts }) => {
+    const isAgent = role === "agent";
+    const el = document.createElement("div");
+    if (isAgent) {
+      el.className = "space-y-1 group";
+      el.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="text-[9px] font-black uppercase tracking-widest text-primary">Ella</span>
+          <span class="text-[9px] text-outline-variant">${ts}</span>
+        </div>
+        <p class="text-[12.5px] leading-relaxed text-on-surface-variant max-w-[92%] font-light italic">"${text}"</p>
+      `;
+    } else {
+      el.className = "space-y-1 pl-3 border-l-2 border-surface-container-high group";
+      el.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="text-[9px] font-black uppercase tracking-widest text-secondary">Student</span>
+          <span class="text-[9px] text-outline-variant">${ts}</span>
+        </div>
+        <p class="text-[12.5px] leading-relaxed text-on-surface">"${text}"</p>
+      `;
+    }
+    list.appendChild(el);
+  });
+  // End dots
+  const end = document.createElement("div");
+  end.className = "pt-6 flex justify-center gap-1";
+  end.innerHTML = `<span class="w-1 h-1 bg-outline-variant rounded-full"></span><span class="w-1 h-1 bg-outline-variant rounded-full"></span><span class="w-1 h-1 bg-outline-variant rounded-full"></span>`;
+  list.appendChild(end);
+  document.getElementById("turn-count").textContent = `${turns.length} turns`;
+}
+
+// ── Analysis rendering ────────────────────────────────────────────────────────
+
+function renderAnalysis(a) {
+  document.getElementById("a-summary").textContent = a.clean_summary;
+
+  const fitMap = [
+    ["Motivation",          a.program_fit?.motivation],
+    ["Program understanding",a.program_fit?.program_understanding],
+    ["Education relevance", a.program_fit?.education_relevance],
+    ["Work relevance",      a.program_fit?.work_relevance],
+    ["Resilience",          a.program_fit?.resilience_response],
+  ];
+  document.getElementById("a-fit").innerHTML = fitMap
+    .filter(([, f]) => f)
+    .map(([label, f]) => renderFieldRow(label, f))
+    .join("");
+
+  const finMap = [
+    ["Funding source",      a.financial_resources?.funding_source],
+    ["Savings / family",    a.financial_resources?.savings_or_family_support],
+    ["Debt status",         a.financial_resources?.debt_status],
+    ["Cash collateral",     a.financial_resources?.cash_collateral_source],
+    ["Monthly payments",    a.financial_resources?.monthly_payment_plan],
+    ["Backup plan",         a.financial_resources?.backup_plan],
+  ];
+  document.getElementById("a-fin").innerHTML = finMap
+    .filter(([, f]) => f)
+    .map(([label, f]) => renderFieldRow(label, f))
+    .join("");
+
+  const flagsEl = document.getElementById("a-flags");
+  flagsEl.innerHTML = (a.contradiction_flags || [])
+    .map(f => `<li class="flex gap-2"><span class="text-error font-bold flex-shrink-0 mt-0.5">!</span><span>${f}</span></li>`)
+    .join("") || `<li class="text-outline-variant italic">None identified</li>`;
+
+  const missingEl = document.getElementById("a-missing");
+  missingEl.innerHTML = (a.missing_information || [])
+    .map(m => `<li class="flex gap-2"><span class="text-outline-variant flex-shrink-0 mt-0.5">–</span><span>${m}</span></li>`)
+    .join("") || `<li class="text-outline-variant italic">None identified</li>`;
+
+  document.getElementById("a-note").textContent = a.reviewer_note || "";
+}
+
+// ── Status helpers ────────────────────────────────────────────────────────────
+
+function setStatus(state) {
+  const dot  = document.getElementById("status-dot");
+  const text = document.getElementById("status-text");
+  const btn  = document.getElementById("process-btn");
+  const spinner = document.getElementById("btn-spinner");
+  const btnText = document.getElementById("btn-text");
+
+  const states = {
+    ready:      { dotClass: "bg-outline-variant", label: "Ready",      busy: false },
+    processing: { dotClass: "bg-primary animate-pulse", label: "Processing", busy: true },
+    done:       { dotClass: "bg-green-500",  label: "Completed",  busy: false },
+    error:      { dotClass: "bg-error",       label: "Error",      busy: false },
+  };
+  const s = states[state] || states.ready;
+  dot.className  = `w-1.5 h-1.5 rounded-full ${s.dotClass}`;
+  text.textContent = s.label;
+  btn.disabled   = s.busy;
+  spinner.classList.toggle("hidden", !s.busy);
+  btnText.textContent = s.busy ? "Processing…" : "Process Interview";
+}
+
+function showError(msg) {
+  document.getElementById("error-bar").classList.remove("hidden");
+  document.getElementById("error-text").textContent = msg;
+}
+
+function clearError() {
+  document.getElementById("error-bar").classList.add("hidden");
+  document.getElementById("error-text").textContent = "";
+}
+
+// ── Process ───────────────────────────────────────────────────────────────────
+
+async function processInterview() {
+  const raw = document.getElementById("conv-input").value.trim();
+  // Accept full ElevenLabs URLs — extract just the conv_... ID
+  const match = raw.match(/(conv_[a-zA-Z0-9]+)/);
+  const id = match ? match[1] : raw;
+  if (!id) { showError("Please enter a conversation ID."); return; }
+
+  clearError();
+  setStatus("processing");
+
+  try {
+    const res = await fetch("/api/process-interview", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ conversationId: id }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setStatus("error");
+      showError(data.error || "Something went wrong.");
+      return;
+    }
+
+    // Populate metadata
+    const meta = data.meta;
+    document.getElementById("meta-id").textContent = meta.conversation_id;
+    document.getElementById("meta-agent").textContent = meta.agent_name;
+    document.getElementById("meta-duration").textContent = meta.duration_secs ? `${meta.duration_secs}s` : "—";
+    document.getElementById("meta-time").textContent = new Date(meta.analyzed_at).toLocaleTimeString();
+    document.getElementById("meta-row").classList.replace("hidden", "flex");
+
+    renderTranscript(data.transcript);
+    renderAnalysis(data.analysis);
+
+    document.getElementById("empty-state").classList.add("hidden");
+    document.getElementById("main-content").classList.remove("hidden");
+    document.getElementById("action-bar").classList.remove("hidden");
+
+    setStatus("done");
+  } catch (err) {
+    setStatus("error");
+    showError(`Request failed: ${err.message}`);
+  }
+}
+
+// ── Wire up ───────────────────────────────────────────────────────────────────
+
+document.getElementById("process-btn").addEventListener("click", processInterview);
+document.getElementById("conv-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") processInterview();
+});
+</script>
+</body>
+</html>

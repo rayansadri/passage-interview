@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Passage — Voice Interview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f4f5f8;
+      --surface:   #ffffff;
+      --header:    #1c1b18;
+      --text:      #1c1b18;
+      --muted:     #5f5e5e;
+      --dim:       #9a9794;
+      --border:    #e5e3de;
+      --orange:    #FF6F00;
+      --orange-dim:#fff0e0;
+      --sans:      'Inter', system-ui, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────── */
+
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      background: var(--header);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+    }
+
+    .logo svg { height: 22px; width: auto; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4a4a48;
+      transition: background 0.3s ease;
+    }
+
+    .status-dot.live { background: #34d399; }
+    .status-dot.connecting { background: #fbbf24; animation: blink 1s ease-in-out infinite; }
+
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .timer {
+      font-size: 13px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.04em;
+      display: none;
+    }
+
+    /* ── SESSION WARNING BANNER ─────────────────────────── */
+
+    #session-warning {
+      display: none;
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      z-index: 45;
+      background: #fefaf0;
+      border-bottom: 1px solid #f5e09a;
+      padding: 8px 24px;
+      text-align: center;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #8a6000;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── SECTION TABS ───────────────────────────────────── */
+
+    .section-tabs {
+      position: fixed;
+      top: 56px; left: 0; right: 0;
+      z-index: 40;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: none;
+      padding: 0 28px;
+      height: 40px;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    /* When warning is visible, push tabs down below it */
+    body.warning-visible .section-tabs {
+      top: 89px;
+    }
+
+    .tab {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      padding-bottom: 2px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      color: var(--text);
+      border-bottom-color: var(--orange);
+    }
+
+    /* ── MAIN LAYOUT ────────────────────────────────────── */
+
+    main {
+      min-height: 100vh;
+      padding-top: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    main.has-tabs { padding-top: 96px; }
+    main.has-tabs.has-warning { padding-top: 129px; }
+
+    /* ── IDLE STATE ─────────────────────────────────────── */
+
+    #state-idle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 48px 24px;
+      max-width: 520px;
+    }
+
+    .idle-orb {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: 0 4px 32px rgba(28,27,24,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
+
+    .idle-orb-inner {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .idle-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+
+    .idle-desc {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .idle-note {
+      font-size: 11px;
+      color: var(--dim);
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .applicant-context {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
+
+    .context-chip {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 12px;
+    }
+
+    .btn-start {
+      background: var(--text);
+      color: #ffffff;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      padding: 14px 36px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    .btn-start:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn-start:active { transform: translateY(0); }
+    .btn-start:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-start.orange {
+      background: var(--orange);
+    }
+
+    /* ── CONNECTING STATE ───────────────────────────────── */
+
+    #state-connecting {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+    }
+
+    .connecting-orb {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: 0 4px 32px rgba(28,27,24,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .connecting-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,111,0,0.25);
+      animation: ring-expand 1.8s ease-out infinite;
+    }
+
+    .connecting-ring:nth-child(2) { animation-delay: 0.6s; }
+    .connecting-ring:nth-child(3) { animation-delay: 1.2s; }
+
+    @keyframes ring-expand {
+      0%   { width: 96px;  height: 96px;  opacity: 0.8; }
+      100% { width: 180px; height: 180px; opacity: 0; }
+    }
+
+    .connecting-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--orange);
+      opacity: 0.5;
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    .connecting-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── ACTIVE STATE ───────────────────────────────────── */
+
+    #state-active {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      padding: 24px;
+    }
+
+    /* Orb */
+    .orb-stage {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 280px;
+      height: 280px;
+      margin-bottom: 40px;
+    }
+
+    .orb-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,111,0,0.18);
+      transition: border-color 0.3s;
+    }
+
+    .orb-ring-1 { width: 280px; height: 280px; animation: pulse-ring 3s ease-out infinite; }
+    .orb-ring-2 { width: 230px; height: 230px; animation: pulse-ring 3s ease-out infinite 0.8s; }
+    .orb-ring-3 { width: 180px; height: 180px; animation: pulse-ring 3s ease-out infinite 1.6s; }
+
+    @keyframes pulse-ring {
+      0%   { opacity: 0.7; transform: scale(1); }
+      60%  { opacity: 0.2; }
+      100% { opacity: 0;   transform: scale(1.12); }
+    }
+
+    .orb-stage.speaking .orb-ring { border-color: rgba(255,111,0,0.5); }
+    .orb-stage.speaking .orb-ring-1 { animation-duration: 1.2s; }
+    .orb-stage.speaking .orb-ring-2 { animation-duration: 1.2s; animation-delay: 0.3s; }
+    .orb-stage.speaking .orb-ring-3 { animation-duration: 1.2s; animation-delay: 0.6s; }
+
+    .orb-body {
+      position: relative;
+      z-index: 2;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow:
+        0 8px 48px rgba(28,27,24,0.10),
+        0 2px 8px rgba(28,27,24,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: box-shadow 0.3s;
+    }
+
+    .orb-stage.speaking .orb-body {
+      box-shadow:
+        0 8px 48px rgba(255,111,0,0.18),
+        0 2px 8px rgba(28,27,24,0.06);
+    }
+
+    .orb-logo { height: 18px; width: auto; }
+
+    /* Current question */
+    .question-area {
+      max-width: 540px;
+      text-align: center;
+    }
+
+    .question-source {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 12px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 1.65;
+      color: var(--text);
+      font-style: italic;
+      min-height: 60px;
+      transition: opacity 0.3s;
+    }
+
+    /* Mic bar */
+    .mic-bar {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      padding: 10px 20px;
+      box-shadow: 0 4px 24px rgba(28,27,24,0.08);
+    }
+
+    .mic-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--muted);
+    }
+
+    .mic-waves {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 18px;
+    }
+
+    .mic-wave {
+      width: 3px;
+      border-radius: 2px;
+      background: var(--orange);
+      animation: wave-bounce 0.8s ease-in-out infinite;
+    }
+
+    .mic-wave:nth-child(1) { height: 6px;  animation-delay: 0s; }
+    .mic-wave:nth-child(2) { height: 12px; animation-delay: 0.1s; }
+    .mic-wave:nth-child(3) { height: 18px; animation-delay: 0.2s; }
+    .mic-wave:nth-child(4) { height: 12px; animation-delay: 0.3s; }
+    .mic-wave:nth-child(5) { height: 6px;  animation-delay: 0.4s; }
+
+    @keyframes wave-bounce {
+      0%, 100% { transform: scaleY(0.5); opacity: 0.6; }
+      50%       { transform: scaleY(1);   opacity: 1; }
+    }
+
+    .mic-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── PROCESSING STATE ───────────────────────────────── */
+
+    #state-processing {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 24px;
+      padding: 48px 24px;
+    }
+
+    .processing-orb {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: 0 4px 32px rgba(28,27,24,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .processing-spinner {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--orange);
+      border-right-color: var(--orange);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .processing-check {
+      width: 24px;
+      height: 24px;
+      color: var(--text);
+    }
+
+    .processing-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .processing-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .processing-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+      min-width: 260px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--dim);
+      font-weight: 500;
+    }
+
+    .step.done { color: var(--muted); }
+    .step.active { color: var(--text); }
+
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+
+    .step.done .step-dot  { background: #34d399; }
+    .step.active .step-dot { background: var(--orange); animation: blink 0.8s ease-in-out infinite; }
+
+    /* ── ERROR ──────────────────────────────────────────── */
+
+    .error-banner {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff0ee;
+      border: 1px solid #f5bcbc;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 12.5px;
+      color: #7a1f1f;
+      max-width: 480px;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(28,27,24,0.08);
+      z-index: 100;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────── */
+
+    @media (max-width: 600px) {
+      .idle-title { font-size: 22px; }
+      .question-text { font-size: 15px; }
+      .orb-stage { width: 220px; height: 220px; }
+      .orb-ring-1 { width: 220px; height: 220px; }
+      .orb-ring-2 { width: 180px; height: 180px; }
+      .orb-ring-3 { width: 140px; height: 140px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ───────────────────────────────────────────────────────────── -->
+<header>
+  <div class="logo">
+    <!-- Passage wordmark (white on dark) -->
+    <svg viewBox="0 0 343 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0V59.661H12.2034V43.3898H23.0508C28.8047 43.3898 34.3229 41.1041 38.3915 37.0355C42.46 32.967 44.7458 27.4488 44.7458 21.6949C44.7458 15.9411 42.4601 10.4229 38.3915 6.3543C34.3229 2.28571 28.8047 0 23.0508 0H0ZM21.6972 32.5424H12.2034V10.8475H21.6949C24.5718 10.8475 27.3309 11.9903 29.3652 14.0246C31.3995 16.0589 32.5424 18.818 32.5424 21.6949C32.5424 24.5718 31.3995 27.3309 29.3652 29.3652C27.3315 31.399 24.5733 32.5418 21.6972 32.5424Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M66.4407 61.017C54.9153 61.017 44.7458 50.8476 44.7458 37.9662C44.7458 25.0848 54.9153 14.9153 66.4407 14.9153C74.5763 14.9153 77.2881 17.6271 79.322 19.661L80.678 16.2713H90.8475V59.6611H80.678L79.322 56.2712C77.2881 58.3051 74.5762 61.017 66.4407 61.017ZM56.2712 37.9662C56.2712 31.1865 61.9686 25.7628 68.7482 25.7628C75.5279 25.7628 80.678 31.1865 80.678 37.9662C80.678 44.7459 75.2542 50.1696 68.4746 50.1696C61.6949 50.1696 56.2712 44.7459 56.2712 37.9662Z" fill="white"/>
+      <path d="M105.514 39.845L105.495 39.8377L105.476 39.8315C99.8155 38.0232 95.3878 34.4283 95.3878 28.8773C95.3878 20.5763 102.946 14.9153 111.91 14.9153C114.758 14.9153 118.603 15.4838 121.85 17.4382C124.919 19.2849 127.495 22.3895 128.19 27.5593H116.518C116.437 27.0421 116.257 26.3709 115.792 25.7638C115.083 24.8383 113.834 24.1993 111.75 24.1993C110.2 24.1993 109.077 24.6909 108.34 25.4279C107.615 26.1529 107.312 27.0689 107.312 27.8373C107.312 29.3957 108.388 30.5138 109.716 31.3258C111.057 32.1452 112.831 32.7654 114.598 33.2876L114.609 33.2907C118.397 34.3383 122.157 35.3927 124.986 37.3361C127.754 39.238 129.632 41.9951 129.632 46.5573C129.632 55.4049 121.85 60.9993 112.23 60.9993C108.956 60.9993 104.872 60.2562 101.481 58.1234C98.2696 56.1039 95.648 52.8225 94.9152 47.6353H106.784C107.223 49.5582 108.402 50.6039 109.589 51.1443C110.843 51.7153 112.082 51.7153 112.385 51.7153H112.39C113.627 51.7153 114.922 51.3644 115.927 50.6904C116.941 50.0108 117.708 48.9615 117.708 47.5973C117.708 46.8078 117.554 46.1121 117.196 45.4906C116.841 44.8736 116.314 44.3808 115.651 43.9474C114.376 43.114 112.438 42.4067 109.848 41.4614L109.749 41.4254C108.509 40.9726 107.103 40.4595 105.514 39.845Z" fill="white"/>
+      <path d="M142.125 39.845L142.106 39.8377L142.086 39.8315C136.426 38.0232 131.998 34.4283 131.998 28.8773C131.998 20.5763 139.556 14.9153 148.52 14.9153C151.368 14.9153 155.213 15.4838 158.46 17.4382C161.529 19.2849 164.105 22.3895 164.8 27.5593H153.128C153.048 27.0421 152.867 26.3709 152.402 25.7638C151.693 24.8383 150.444 24.1993 148.36 24.1993C146.81 24.1993 145.688 24.6909 144.951 25.4279C144.226 26.1529 143.922 27.0689 143.922 27.8373C143.922 29.3957 144.998 30.5138 146.326 31.3258C147.667 32.1452 149.441 32.7654 151.208 33.2876L151.219 33.2907C155.007 34.3383 158.768 35.3927 161.596 37.3361C164.364 39.238 166.242 41.9951 166.242 46.5573C166.242 55.4049 158.46 60.9993 148.84 60.9993C145.566 60.9993 141.482 60.2562 138.091 58.1234C134.88 56.1039 132.258 52.8225 131.525 47.6353H143.395C143.833 49.5582 145.012 50.6039 146.199 51.1443C147.453 51.7153 148.692 51.7153 148.996 51.7153H149C150.237 51.7153 151.532 51.3644 152.538 50.6904C153.551 50.0108 154.318 48.9615 154.318 47.5973C154.318 46.8078 154.164 46.1121 153.806 45.4906C153.451 44.8736 152.924 44.3808 152.261 43.9474C150.986 43.114 149.048 42.4067 146.458 41.4614L146.359 41.4254C145.119 40.9726 143.713 40.4595 142.125 39.845Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M168.136 37.9662C168.136 50.8476 178.305 61.017 189.83 61.017C197.966 61.017 200.678 58.3051 202.712 56.2712L204.068 59.6611H214.237V16.2713H204.068L202.712 19.661C200.678 17.6271 197.966 14.9153 189.83 14.9153C178.305 14.9153 168.136 25.0848 168.136 37.9662ZM192.138 25.7628C185.358 25.7628 179.661 31.1865 179.661 37.9662C179.661 44.7459 185.085 50.1696 191.864 50.1696C198.644 50.1696 204.068 44.7459 204.068 37.9662C204.068 31.1865 198.918 25.7628 192.138 25.7628Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M240 61.017C228.475 61.017 218.305 50.8476 218.305 37.9662C218.305 25.0848 228.475 14.9153 240 14.9153C248.136 14.9153 250.847 17.6271 252.881 19.661L254.237 16.2713H264.407V58.3051C264.342 60.9406 264.023 64.1081 262.808 67.2042C261.295 71.0625 258.487 74.5231 253.809 76.9061C246.338 80.7113 232.813 82.095 221.518 74.186L227.74 65.3005C235.216 70.5355 244.368 69.5411 248.886 67.2402C251.124 66.0999 252.135 64.7104 252.71 63.2435C253.368 61.5664 253.559 59.5136 253.559 56.9492V56.2712C251.525 58.3051 248.136 61.017 240 61.017ZM229.83 37.9662C229.83 31.1865 235.528 25.7628 242.308 25.7628C249.087 25.7628 254.237 31.1865 254.237 37.9662C254.237 44.7459 248.814 50.1696 242.034 50.1696C235.254 50.1696 229.83 44.7459 229.83 37.9662Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M268.475 37.9661C268.475 50.6967 278.795 61.017 291.525 61.017C293.176 61.0173 302.398 61.0191 310.044 54.2231L302.837 46.1156C298.333 50.1198 292.681 50.1695 291.525 50.1695C286.507 50.1695 282.238 46.7736 280.656 42.0339H314.218C314.454 40.7135 314.576 39.3541 314.576 37.9661C314.576 25.2355 304.256 14.9153 291.525 14.9153C278.795 14.9153 268.475 25.2355 268.475 37.9661ZM302.395 33.8983C300.813 29.1585 296.544 25.7627 291.525 25.7627C286.507 25.7627 282.238 29.1585 280.656 33.8983H302.395Z" fill="white"/>
+      <circle cx="332.76" cy="51" r="10" fill="#FF6F00"/>
+    </svg>
+  </div>
+
+  <div class="header-right">
+    <div class="status-indicator">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-label">Ready</span>
+    </div>
+    <div class="timer" id="timer">0:00</div>
+  </div>
+</header>
+
+<!-- ── SESSION WARNING BANNER ────────────────────────────────────────────── -->
+<div id="session-warning">
+  Please stay on this page during the interview. Leaving may interrupt the session.
+</div>
+
+<!-- ── SECTION TABS ──────────────────────────────────────────────────────── -->
+<div class="section-tabs" id="section-tabs">
+  <span class="tab active" id="tab-program">Program Fit</span>
+  <span class="tab" id="tab-financial">Financial Resources</span>
+</div>
+
+<!-- ── MAIN ─────────────────────────────────────────────────────────────── -->
+<main id="main">
+
+  <!-- IDLE -->
+  <div id="state-idle">
+    <div class="idle-orb">
+      <div class="idle-orb-inner"></div>
+    </div>
+
+    <div id="applicant-context" class="applicant-context" style="display:none"></div>
+
+    <h1 class="idle-title">Your Interview<br>with Passage</h1>
+    <p class="idle-desc">This short voice interview helps us better understand<br>your program plans and financial situation.</p>
+    <p class="idle-note">Your responses support human review and do not constitute a decision.</p>
+
+    <button class="btn-start" id="start-btn">Begin Voice Interview</button>
+    <div id="idle-error" style="margin-top:16px;font-size:12px;color:#9e3f4e;display:none;"></div>
+  </div>
+
+  <!-- CONNECTING -->
+  <div id="state-connecting">
+    <div class="connecting-orb">
+      <div class="connecting-ring"></div>
+      <div class="connecting-ring"></div>
+      <div class="connecting-ring"></div>
+      <div class="connecting-dot"></div>
+    </div>
+    <p class="connecting-label">Connecting — please allow microphone access</p>
+  </div>
+
+  <!-- ACTIVE -->
+  <div id="state-active">
+    <div class="orb-stage" id="orb-stage">
+      <div class="orb-ring orb-ring-1"></div>
+      <div class="orb-ring orb-ring-2"></div>
+      <div class="orb-ring orb-ring-3"></div>
+      <div class="orb-body">
+        <!-- Small orange dot as Passage mark -->
+        <div style="width:14px;height:14px;border-radius:50%;background:#FF6F00;"></div>
+      </div>
+    </div>
+
+    <div class="question-area">
+      <div class="question-source" id="question-source">Ella is speaking</div>
+      <div class="question-text" id="question-text">…</div>
+    </div>
+
+    <div class="mic-bar">
+      <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+      </svg>
+      <div class="mic-waves">
+        <div class="mic-wave"></div>
+        <div class="mic-wave"></div>
+        <div class="mic-wave"></div>
+        <div class="mic-wave"></div>
+        <div class="mic-wave"></div>
+      </div>
+      <span class="mic-label">Microphone active</span>
+    </div>
+  </div>
+
+  <!-- PROCESSING -->
+  <div id="state-processing">
+    <div class="processing-orb">
+      <div class="processing-spinner" id="proc-spinner"></div>
+      <svg class="processing-check" id="proc-check" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+      <div style="width:14px;height:14px;border-radius:50%;background:#FF6F00;"></div>
+    </div>
+
+    <div>
+      <h2 class="processing-title">Interview complete.</h2>
+      <p class="processing-sub">We are processing your assessment now.</p>
+    </div>
+
+    <div class="processing-steps">
+      <div class="step active" id="step-fetch">
+        <div class="step-dot"></div>
+        Retrieving interview transcript
+      </div>
+      <div class="step" id="step-analyze">
+        <div class="step-dot"></div>
+        Running assessment analysis
+      </div>
+      <div class="step" id="step-done">
+        <div class="step-dot"></div>
+        Preparing reviewer output
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ERROR BANNER -->
+<div class="error-banner" id="error-banner"></div>
+
+<script type="module">
+// ── ElevenLabs SDK ────────────────────────────────────────────────────────────
+import { Conversation } from 'https://esm.sh/@11labs/client@latest';
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let conv        = null;
+let convId      = null;
+let timerHandle = null;
+let elapsed     = 0;
+let speakTimer  = null;
+
+// ── Applicant context from URL params ─────────────────────────────────────────
+const params  = new URLSearchParams(window.location.search);
+const name    = params.get('name');
+const program = params.get('program');
+const intake  = params.get('intake');
+
+if (name || program || intake) {
+  const ctx = document.getElementById('applicant-context');
+  ctx.style.display = 'flex';
+  if (name)    ctx.innerHTML += `<span class="context-chip">${name}</span>`;
+  if (program) ctx.innerHTML += `<span class="context-chip">${program}</span>`;
+  if (intake)  ctx.innerHTML += `<span class="context-chip">${intake}</span>`;
+}
+
+// ── Warning banner helpers ────────────────────────────────────────────────────
+function showWarning() {
+  document.getElementById('session-warning').style.display = 'block';
+  document.body.classList.add('warning-visible');
+  const mainEl = document.getElementById('main');
+  if (mainEl.classList.contains('has-tabs')) {
+    mainEl.classList.add('has-warning');
+  }
+}
+
+function hideWarning() {
+  document.getElementById('session-warning').style.display = 'none';
+  document.body.classList.remove('warning-visible');
+  document.getElementById('main').classList.remove('has-warning');
+}
+
+// ── State machine ─────────────────────────────────────────────────────────────
+function setState(s) {
+  ['idle','connecting','active','processing'].forEach(id => {
+    const el = document.getElementById(`state-${id}`);
+    el.style.display = el.id === `state-${s}` ? 'flex' : 'none';
+  });
+
+  // Show warning during connecting and active; hide otherwise
+  if (s === 'connecting' || s === 'active') {
+    showWarning();
+  } else {
+    hideWarning();
+  }
+}
+
+// ── Status dot ────────────────────────────────────────────────────────────────
+function setStatus(state, label) {
+  const dot = document.getElementById('status-dot');
+  const lbl = document.getElementById('status-label');
+  dot.className = 'status-dot' + (state ? ` ${state}` : '');
+  lbl.textContent = label;
+}
+
+// ── Timer ─────────────────────────────────────────────────────────────────────
+function startTimer() {
+  document.getElementById('timer').style.display = 'block';
+  elapsed = 0;
+  timerHandle = setInterval(() => {
+    elapsed++;
+    const m = Math.floor(elapsed / 60);
+    const s = elapsed % 60;
+    document.getElementById('timer').textContent = `${m}:${String(s).padStart(2,'0')}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerHandle);
+}
+
+// ── Section tab logic ─────────────────────────────────────────────────────────
+const FINANCIAL_KEYWORDS = ['saving','debt','money','payment','collateral','fund','financ','cost','loan','pay','income','support','family help','backup'];
+
+function updateTab(message) {
+  const lc = message.toLowerCase();
+  const isFinancial = FINANCIAL_KEYWORDS.some(k => lc.includes(k));
+  document.getElementById('tab-program').classList.toggle('active', !isFinancial);
+  document.getElementById('tab-financial').classList.toggle('active', isFinancial);
+}
+
+// ── Orb speaking animation ────────────────────────────────────────────────────
+function setSpeaking(on) {
+  document.getElementById('orb-stage').classList.toggle('speaking', on);
+  const src = document.getElementById('question-source');
+  src.textContent = on ? 'Ella is speaking' : 'Listening…';
+}
+
+// ── Error ─────────────────────────────────────────────────────────────────────
+function showError(msg) {
+  const b = document.getElementById('error-banner');
+  b.textContent = msg;
+  b.style.display = 'block';
+  setTimeout(() => { b.style.display = 'none'; }, 6000);
+}
+
+// ── Process steps UI ─────────────────────────────────────────────────────────
+function advanceStep(stepId) {
+  const steps = ['step-fetch','step-analyze','step-done'];
+  const idx = steps.indexOf(stepId);
+  steps.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'step ' + (i < idx ? 'done' : i === idx ? 'active' : '');
+  });
+}
+
+// ── Auto-process after interview ─────────────────────────────────────────────
+async function handleInterviewEnd(id) {
+  setState('processing');
+  setStatus('', 'Processing');
+  console.log('[interview] handleInterviewEnd called with id:', id);
+
+  // Fallback: fetch latest if onConnect did not provide an ID
+  if (!id) {
+    console.log('[interview] No convId from onConnect — using latest-conversation fallback');
+    try {
+      const r = await fetch('/api/latest-conversation');
+      const d = await r.json();
+      id = d.conversationId;
+      console.log('[interview] Fallback returned id:', id);
+    } catch (e) {
+      console.error('[interview] Fallback failed:', e.message);
+      showError('Could not retrieve conversation ID. Please open the review page manually.');
+      return;
+    }
+  }
+
+  if (!id) {
+    showError('No conversation ID found. Please process manually.');
+    return;
+  }
+
+  console.log('[interview] Redirecting to review with id:', id);
+  advanceStep('step-fetch');
+  await sleep(800);
+  advanceStep('step-analyze');
+
+  window.location.href = `/review.html?id=${id}&auto=1`;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Start interview ───────────────────────────────────────────────────────────
+document.getElementById('start-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('start-btn');
+  btn.disabled = true;
+
+  // Fetch config
+  let agentId;
+  try {
+    const cfg = await fetch('/api/config').then(r => r.json());
+    agentId = cfg.agentId;
+    if (!agentId) {
+      document.getElementById('idle-error').style.display = 'block';
+      document.getElementById('idle-error').textContent = 'Agent ID not configured. Set ELEVENLABS_AGENT_ID on the server.';
+      btn.disabled = false;
+      return;
+    }
+  } catch (e) {
+    document.getElementById('idle-error').style.display = 'block';
+    document.getElementById('idle-error').textContent = 'Could not connect to server.';
+    btn.disabled = false;
+    return;
+  }
+
+  setState('connecting');
+  setStatus('connecting', 'Connecting');
+  document.getElementById('section-tabs').style.display = 'flex';
+  document.getElementById('main').classList.add('has-tabs');
+
+  try {
+    conv = await Conversation.startSession({
+      agentId,
+
+      onConnect: (params) => {
+        // Log the full params object — SDK versions differ on field name
+        console.log('[interview] onConnect params:', JSON.stringify(params));
+        // Support both camelCase and snake_case variants
+        convId = params?.conversationId || params?.conversation_id || null;
+        console.log('[interview] Captured convId:', convId);
+        setState('active');
+        setStatus('live', 'Live');
+        startTimer();
+        setSpeaking(true);
+      },
+
+      onDisconnect: () => {
+        console.log('[interview] onDisconnect — convId at disconnect:', convId);
+        stopTimer();
+        setSpeaking(false);
+        handleInterviewEnd(convId);
+      },
+
+      onMessage: ({ message, source }) => {
+        if (source === 'ai' || source === 'agent') {
+          document.getElementById('question-text').textContent = `"${message}"`;
+          updateTab(message);
+          setSpeaking(true);
+          clearTimeout(speakTimer);
+          speakTimer = setTimeout(() => setSpeaking(false), 3000);
+        } else {
+          setSpeaking(false);
+        }
+      },
+
+      onError: (err) => {
+        showError(`Connection error: ${err?.message || err}`);
+        setState('idle');
+        setStatus('', 'Ready');
+        btn.disabled = false;
+      },
+    });
+  } catch (err) {
+    showError(`Failed to start interview: ${err?.message || err}`);
+    setState('idle');
+    setStatus('', 'Ready');
+    document.getElementById('section-tabs').style.display = 'none';
+    document.getElementById('main').classList.remove('has-tabs');
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

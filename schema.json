@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EllaInterviewAnalysis",
+  "type": "object",
+  "required": [
+    "clean_summary",
+    "program_fit",
+    "financial_resources",
+    "contradiction_flags",
+    "missing_information",
+    "reviewer_note"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "clean_summary": {
+      "type": "string"
+    },
+    "program_fit": {
+      "type": "object",
+      "required": [
+        "motivation",
+        "program_understanding",
+        "education_relevance",
+        "work_relevance",
+        "resilience_response"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "motivation":           { "$ref": "#/$defs/analysisField" },
+        "program_understanding":{ "$ref": "#/$defs/analysisField" },
+        "education_relevance":  { "$ref": "#/$defs/analysisField" },
+        "work_relevance":       { "$ref": "#/$defs/analysisField" },
+        "resilience_response":  { "$ref": "#/$defs/analysisField" }
+      }
+    },
+    "financial_resources": {
+      "type": "object",
+      "required": [
+        "funding_source",
+        "savings_or_family_support",
+        "debt_status",
+        "cash_collateral_source",
+        "monthly_payment_plan",
+        "backup_plan"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "funding_source":            { "$ref": "#/$defs/analysisField" },
+        "savings_or_family_support": { "$ref": "#/$defs/analysisField" },
+        "debt_status":               { "$ref": "#/$defs/analysisField" },
+        "cash_collateral_source":    { "$ref": "#/$defs/analysisField" },
+        "monthly_payment_plan":      { "$ref": "#/$defs/analysisField" },
+        "backup_plan":               { "$ref": "#/$defs/analysisField" }
+      }
+    },
+    "contradiction_flags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "missing_information": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "reviewer_note": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "analysisField": {
+      "type": "object",
+      "required": ["evidence", "quality", "notes"],
+      "additionalProperties": false,
+      "properties": {
+        "evidence": { "type": "string" },
+        "quality": {
+          "type": "string",
+          "enum": ["strong", "medium", "weak", "missing", "unclear"]
+        },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

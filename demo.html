@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ella Finance Review Demo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #f7f6f3;
+      --surface:     #ffffff;
+      --border:      #e5e3de;
+      --border-soft: #eeece8;
+      --text:        #1c1b18;
+      --text-muted:  #6b6860;
+      --text-dim:    #a09e9a;
+      --accent:      #2f5be8;
+      --accent-bg:   #eef2fd;
+      --green:       #1a7f4b;
+      --green-bg:    #edf7f1;
+      --yellow:      #8a6000;
+      --yellow-bg:   #fef9ec;
+      --red:         #b83232;
+      --red-bg:      #fdf0f0;
+      --gray:        #5c5a56;
+      --gray-bg:     #f2f1ee;
+      --radius:      8px;
+      --radius-lg:   12px;
+      --sans:        -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+      --mono:        'SF Mono', 'Fira Code', ui-monospace, monospace;
+    }
+
+    html { font-size: 14px; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────── */
+
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-wordmark {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--border);
+    }
+
+    .header-page {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .meta-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .meta-chip strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--yellow-bg);
+      color: var(--yellow);
+      border: 1px solid #f5e09a;
+    }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* ── META BAR ───────────────────────────────────────── */
+
+    .meta-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meta-bar-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+    }
+
+    .meta-field {
+      padding: 12px 24px 12px 0;
+      margin-right: 24px;
+      border-right: 1px solid var(--border-soft);
+    }
+
+    .meta-field:last-child {
+      border-right: none;
+    }
+
+    .meta-field-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 2px;
+    }
+
+    .meta-field-value {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text);
+      font-family: var(--mono);
+    }
+
+    /* ── MAIN ───────────────────────────────────────────── */
+
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ── PANEL ──────────────────────────────────────────── */
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .panel-tag {
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--text-dim);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-family: var(--mono);
+    }
+
+    /* ── TRANSCRIPT ─────────────────────────────────────── */
+
+    .transcript-body {
+      padding: 4px 0;
+      max-height: calc(100vh - 220px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .transcript-body::-webkit-scrollbar { width: 4px; }
+    .transcript-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .turn {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 0 12px;
+      padding: 11px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      align-items: start;
+    }
+
+    .turn:last-child { border-bottom: none; }
+
+    .turn-speaker {
+      padding-top: 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .speaker-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .tag-agent {
+      color: var(--accent);
+      background: var(--accent-bg);
+    }
+
+    .tag-student {
+      color: var(--green);
+      background: var(--green-bg);
+    }
+
+    .turn-ts {
+      font-size: 9.5px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+    }
+
+    .turn-text {
+      font-size: 13px;
+      line-height: 1.65;
+      padding: 2px 0;
+    }
+
+    .turn-text.agent  { color: var(--text-muted); }
+    .turn-text.student { color: var(--text); }
+
+    /* ── ANALYSIS ───────────────────────────────────────── */
+
+    .analysis-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: calc(100vh - 220px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .analysis-body::-webkit-scrollbar { width: 4px; }
+    .analysis-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Summary */
+    .summary-text {
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--text);
+    }
+
+    /* Section */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+
+    /* Fit / Financial rows */
+    .row-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 140px 1fr 72px;
+      gap: 8px 10px;
+      align-items: start;
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+    }
+
+    .row-key {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding-top: 1px;
+      line-height: 1.4;
+    }
+
+    .row-evidence {
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .row-notes {
+      grid-column: 2;
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    .quality {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      align-self: start;
+    }
+
+    .q-strong  { background: var(--green-bg);  color: var(--green);  border: 1px solid #b6e8cc; }
+    .q-medium  { background: var(--yellow-bg); color: var(--yellow); border: 1px solid #f5d97a; }
+    .q-weak    { background: var(--red-bg);    color: var(--red);    border: 1px solid #f5bcbc; }
+    .q-missing { background: var(--gray-bg);   color: var(--gray);   border: 1px solid var(--border); }
+    .q-unclear { background: #f3f0ff;          color: #5b3fa0;       border: 1px solid #d5c9f5; }
+
+    /* Flags / Missing */
+    .flag-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .flag {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 9px 12px;
+      border-radius: var(--radius);
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+
+    .flag-icon { flex-shrink: 0; margin-top: 1px; }
+
+    .flag-contradiction {
+      background: var(--red-bg);
+      border: 1px solid #f5bcbc;
+      color: #7a1f1f;
+    }
+
+    .flag-missing {
+      background: var(--gray-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    /* Reviewer note */
+    .reviewer-note-text {
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--text);
+      background: var(--yellow-bg);
+      border: 1px solid #f5e09a;
+      border-radius: var(--radius);
+      padding: 12px 14px;
+    }
+
+    /* ── REVIEWER BOX ───────────────────────────────────── */
+
+    .review-bar {
+      max-width: 1400px;
+      margin: 0 auto 32px;
+      padding: 0 32px;
+    }
+
+    .review-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .review-box-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .review-box-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .review-box-body {
+      padding: 18px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .review-textarea {
+      flex: 1;
+      min-width: 240px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 13px;
+      color: var(--text);
+      font-family: var(--sans);
+      resize: none;
+      height: 58px;
+      line-height: 1.6;
+      transition: border-color 0.15s;
+    }
+
+    .review-textarea::placeholder { color: var(--text-dim); }
+    .review-textarea:focus { outline: none; border-color: #b5c6f7; }
+
+    .review-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-top: 2px;
+    }
+
+    .btn {
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: var(--radius);
+      border: 1px solid;
+      cursor: pointer;
+      font-family: var(--sans);
+      letter-spacing: 0.01em;
+      transition: opacity 0.12s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-followup {
+      background: var(--yellow-bg);
+      color: var(--yellow);
+      border-color: #f5d97a;
+    }
+
+    .btn-clear {
+      background: var(--green-bg);
+      color: var(--green);
+      border-color: #b6e8cc;
+    }
+
+    .btn-escalate {
+      background: var(--red-bg);
+      color: var(--red);
+      border-color: #f5bcbc;
+    }
+
+    /* ── DIVIDERS ────────────────────────────────────────── */
+
+    .section-divider {
+      height: 1px;
+      background: var(--border-soft);
+      margin: 2px 0;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────── */
+
+    @media (max-width: 960px) {
+      .main {
+        grid-template-columns: 1fr;
+        padding: 20px 16px;
+      }
+      .transcript-body, .analysis-body {
+        max-height: 60vh;
+      }
+      .meta-bar-inner { padding: 0 16px; }
+      .header-inner { padding: 14px 0; }
+      .header { padding: 0 16px; }
+      .review-bar { padding: 0 16px; }
+    }
+
+    @media (max-width: 600px) {
+      .row { grid-template-columns: 1fr; }
+      .quality { justify-self: start; }
+      .row-notes { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ───────────────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <span class="header-wordmark">Ella</span>
+      <span class="header-divider"></span>
+      <span class="header-page">Finance Review Demo</span>
+    </div>
+    <div class="header-meta">
+      <div class="meta-chip"><span>Agent</span>&nbsp;<strong>Finance-test</strong></div>
+      <div class="meta-chip"><span>ID</span>&nbsp;<strong>conv_4101kpbg</strong></div>
+      <div class="meta-chip"><span>Model</span>&nbsp;<strong>claude-sonnet-4-6</strong></div>
+      <div class="status-badge"><span class="status-dot"></span>Pending Review</div>
+    </div>
+  </div>
+</header>
+
+<!-- ── META BAR ─────────────────────────────────────────────────────── -->
+<div class="meta-bar">
+  <div class="meta-bar-inner">
+    <div class="meta-field">
+      <div class="meta-field-label">Conversation ID</div>
+      <div class="meta-field-value">conv_4101kpbgsgg5f3erh4ezhhk915yh</div>
+    </div>
+    <div class="meta-field">
+      <div class="meta-field-label">Analyzed At</div>
+      <div class="meta-field-value">2026-04-16 &nbsp;18:50 UTC</div>
+    </div>
+    <div class="meta-field">
+      <div class="meta-field-label">Duration</div>
+      <div class="meta-field-value">3m 46s</div>
+    </div>
+    <div class="meta-field">
+      <div class="meta-field-label">Termination</div>
+      <div class="meta-field-value">end_call tool invoked</div>
+    </div>
+    <div class="meta-field">
+      <div class="meta-field-label">Analysis Status</div>
+      <div class="meta-field-value" style="color:var(--green)">Complete</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ─────────────────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- LEFT: TRANSCRIPT -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Interview Transcript</span>
+      <span class="panel-tag">18 turns</span>
+    </div>
+    <div class="transcript-body" id="transcript"></div>
+  </div>
+
+  <!-- RIGHT: ANALYSIS -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Claude Analysis</span>
+      <span class="panel-tag">claude-sonnet-4-6</span>
+    </div>
+    <div class="analysis-body" id="analysis"></div>
+  </div>
+
+</div>
+
+<!-- ── REVIEWER BOX ─────────────────────────────────────────────────── -->
+<div class="review-bar">
+  <div class="review-box">
+    <div class="review-box-header">
+      <span class="review-box-title">Reviewer Decision</span>
+      <span class="status-badge"><span class="status-dot"></span>Pending</span>
+    </div>
+    <div class="review-box-body">
+      <textarea class="review-textarea" placeholder="Reviewer notes — e.g. scheduled follow-up, requested income proof, escalated to senior underwriter…"></textarea>
+      <div class="review-actions">
+        <button class="btn btn-followup">Follow-up Needed</button>
+        <button class="btn btn-clear">Clear for Review</button>
+        <button class="btn btn-escalate">Escalate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Real transcript (from normalized_conversation.json, deduped) ────────────
+
+const TURNS = [
+  { role: "agent",   ts: "0:00", text: "Hey, I'll ask you a few simple questions to better understand your program fit and financial situation. Just answer as clearly as you can. Let's get started." },
+  { role: "student", ts: "0:12", text: "Yeah, sure." },
+  { role: "agent",   ts: "0:26", text: "Great! What made you choose this program?" },
+  { role: "student", ts: "0:30", text: "You know, I was just interested in computer science." },
+  { role: "agent",   ts: "0:34", text: "What do you hope to learn in this program?" },
+  { role: "student", ts: "0:38", text: "As an experience from the program, I'd like to get to, like, be a better engineer." },
+  { role: "agent",   ts: "0:47", text: "What in your past study may help you succeed here?" },
+  { role: "student", ts: "0:50", text: "I studied math and physics, and I did well in both." },
+  { role: "agent",   ts: "0:57", text: "What in your past work or practical experience may help you succeed here?" },
+  { role: "student", ts: "1:03", text: "Yeah, I did some coding projects and joined a robotics club." },
+  { role: "agent",   ts: "1:07", text: "Imagine the program becomes harder than you expected in the first month and you fall behind on one assignment. What would you do?" },
+  { role: "student", ts: "1:18", text: "It would break the work into steps and make a study plan and ask for help early." },
+  { role: "agent",   ts: "1:24", text: "What kind of job do you hope to get after this program, and why do you think this program will help you get there?" },
+  { role: "student", ts: "1:28", text: "Yeah, I want an engineering job where I can, like, build systems." },
+  { role: "agent",   ts: "1:41", text: "Is the money for school mainly your own money, family support, or both?" },
+  { role: "student", ts: "1:42", text: "Engineering, yeah. No, it's app savings from myself and my parents." },
+  { role: "agent",   ts: "1:56", text: "If your family helps with the cash collateral, will you need to pay that money back later, yes or no?" },
+  { role: "student", ts: "2:02", text: "Oh no. Not needed." },
+  { role: "agent",   ts: "2:14", text: "Just to confirm, do you have any debt at all, yes or no?" },
+  { role: "student", ts: "2:19", text: "No." },
+  { role: "agent",   ts: "2:31", text: "Do you have savings or family support for school?" },
+  { role: "student", ts: "2:35", text: "Yeah, $5,000 CAD." },
+  { role: "agent",   ts: "2:46", text: "Who will help with the cash collateral?" },
+  { role: "student", ts: "3:00", text: "Yeah, my parents." },
+  { role: "agent",   ts: "3:10", text: "Who will actually make the monthly payments, you or your family?" },
+  { role: "student", ts: "3:15", text: "Uh, myself." },
+  { role: "agent",   ts: "3:25", text: "About how much can be paid each month?" },
+  { role: "student", ts: "3:30", text: "Yeah, about like $900 a month." },
+  { role: "agent",   ts: "3:34", text: "If that plan does not work, what is your backup plan?" },
+  { role: "student", ts: "3:40", text: "I use my savings and reduce other expenses." },
+];
+
+// ── Real analysis (from analysis_output.json) ────────────────────────────────
+
+const ANALYSIS = {
+  clean_summary: "The student is interested in computer science and hopes to get an engineering job building systems after completing the program. They have a background in math, physics, coding projects, and a robotics club. Funding will come from personal savings and parental support, totaling $5,000 CAD, with the student planning to make monthly payments of approximately $900. They have no debt, and parents will assist with cash collateral on a gift basis (no repayment required). Their backup plan is to draw on savings and cut expenses if the monthly payment plan falls through.",
+
+  program_fit: [
+    { key: "Motivation",            evidence: "I was just interested in computer science.",                                                quality: "weak",    notes: "Surface-level reason; no elaboration on what draws them to the field or this program specifically." },
+    { key: "Program understanding", evidence: "No response was captured for this question.",                                              quality: "missing", notes: "Agent asked what the student hopes to learn — no answer was recorded. Needs direct follow-up." },
+    { key: "Education relevance",   evidence: "I studied math and physics, and I did well in both.",                                      quality: "medium",  notes: "Relevant academic background confirmed; no detail on level or how it connects to software engineering." },
+    { key: "Work relevance",        evidence: "I did some coding projects and joined a robotics club.",                                   quality: "medium",  notes: "Practical experience exists and is relevant; described vaguely with no outcome or scope detail." },
+    { key: "Resilience response",   evidence: "Break the work into steps, make a study plan, and ask for help early.",                   quality: "medium",  notes: "Concrete and actionable; 'It would' is likely a speech artifact — intent is clear." },
+  ],
+
+  financial_resources: [
+    { key: "Funding source",          evidence: "Savings from myself and my parents.",                                        quality: "medium",  notes: "'App savings' in transcript is a likely audio artifact. Meaning is combined personal and parental funding." },
+    { key: "Savings or family",       evidence: "$5,000 CAD.",                                                               quality: "weak",    notes: "Specific figure given but not contextualized against total program cost — adequacy is unverified." },
+    { key: "Debt status",             evidence: "No.",                                                                       quality: "strong",  notes: "Agent asked directly — yes or no — and student gave a clear no. Cleanest answer in the financial section." },
+    { key: "Cash collateral",         evidence: "Yeah, my parents. / Oh no. Not needed.",                                    quality: "strong",  notes: "Parents confirmed; student explicitly confirmed no repayment required. Internally consistent." },
+    { key: "Monthly payment plan",    evidence: "About like $900 a month. / Myself.",                                        quality: "medium",  notes: "Student personally commits to $900/month — but no income source is identified to sustain this." },
+    { key: "Backup plan",             evidence: "I use my savings and reduce other expenses.",                                quality: "weak",    notes: "Backup plan is circular — it relies on the same savings cited as the primary funding source." },
+  ],
+
+  contradiction_flags: [
+    "Student states primary funding is savings from themselves and their parents, but the total stated is only $5,000 CAD — unclear whether this covers the full program cost or a portion, creating ambiguity about the overall financial plan.",
+    "Student commits to $900/month in personal payments but mentions no income source, which is inconsistent with a credible self-funded payment plan.",
+  ],
+
+  missing_information: [
+    "No response captured for what the student hopes to learn in the program — this question went unanswered.",
+    "No information about current income or employment status to support $900/month in personal payments.",
+    "Total program cost never confirmed, making it impossible to assess whether $5,000 CAD is sufficient.",
+    "No detail on the nature or size of the parental contribution beyond their role as cash collateral provider.",
+  ],
+
+  reviewer_note: "The financial picture is underdeveloped — $5,000 CAD in combined savings is stated, but there is no income source identified to support $900/month in payments, and the backup plan essentially repeats the primary plan. Reviewer should clarify total program cost, confirm whether parental contribution exceeds the stated $5,000, and ask the student to identify their income source.",
+};
+
+// ── Render transcript ─────────────────────────────────────────────────────────
+
+const tEl = document.getElementById("transcript");
+
+TURNS.forEach(({ role, ts, text }) => {
+  const isAgent = role === "agent";
+  const div = document.createElement("div");
+  div.className = "turn";
+  div.innerHTML = `
+    <div class="turn-speaker">
+      <span class="speaker-tag ${isAgent ? "tag-agent" : "tag-student"}">${isAgent ? "Agent" : "Student"}</span>
+      <span class="turn-ts">${ts}</span>
+    </div>
+    <div class="turn-text ${isAgent ? "agent" : "student"}">${text}</div>
+  `;
+  tEl.appendChild(div);
+});
+
+// ── Quality badge helper ──────────────────────────────────────────────────────
+
+function qualityBadge(q) {
+  return `<span class="quality q-${q}">${q}</span>`;
+}
+
+// ── Render analysis ───────────────────────────────────────────────────────────
+
+const aEl = document.getElementById("analysis");
+
+function section(title, content) {
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `<div class="section-label">${title}</div>${content}`;
+  aEl.appendChild(wrap);
+}
+
+// 1. Summary
+section("Clean Summary", `<p class="summary-text">${ANALYSIS.clean_summary}</p>`);
+
+// Divider
+aEl.appendChild(Object.assign(document.createElement("div"), { className: "section-divider" }));
+
+// 2. Program Fit
+const fitRows = ANALYSIS.program_fit.map(({ key, evidence, quality, notes }) => `
+  <div class="row">
+    <div class="row-key">${key}</div>
+    <div class="row-evidence">${evidence}</div>
+    ${qualityBadge(quality)}
+    <div class="row-notes">${notes}</div>
+  </div>
+`).join("");
+section("Program Fit", `<div class="row-grid">${fitRows}</div>`);
+
+aEl.appendChild(Object.assign(document.createElement("div"), { className: "section-divider" }));
+
+// 3. Financial Resources
+const finRows = ANALYSIS.financial_resources.map(({ key, evidence, quality, notes }) => `
+  <div class="row">
+    <div class="row-key">${key}</div>
+    <div class="row-evidence">${evidence}</div>
+    ${qualityBadge(quality)}
+    <div class="row-notes">${notes}</div>
+  </div>
+`).join("");
+section("Financial Resources", `<div class="row-grid">${finRows}</div>`);
+
+aEl.appendChild(Object.assign(document.createElement("div"), { className: "section-divider" }));
+
+// 4. Contradiction Flags
+const flags = ANALYSIS.contradiction_flags.map(f => `
+  <div class="flag flag-contradiction">
+    <span class="flag-icon">▲</span>
+    <span>${f}</span>
+  </div>
+`).join("");
+section("Contradiction Flags", `<div class="flag-list">${flags}</div>`);
+
+aEl.appendChild(Object.assign(document.createElement("div"), { className: "section-divider" }));
+
+// 5. Missing Information
+const missing = ANALYSIS.missing_information.map(m => `
+  <div class="flag flag-missing">
+    <span class="flag-icon">–</span>
+    <span>${m}</span>
+  </div>
+`).join("");
+section("Missing Information", `<div class="flag-list">${missing}</div>`);
+
+aEl.appendChild(Object.assign(document.createElement("div"), { className: "section-divider" }));
+
+// 6. Reviewer Note
+section("Reviewer Note", `<p class="reviewer-note-text">${ANALYSIS.reviewer_note}</p>`);
+
+</script>
+</body>
+</html>
