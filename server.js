@@ -2,6 +2,7 @@
 
 const express = require("express");
 const Anthropic = require("@anthropic-ai/sdk");
+const fetch = require("node-fetch");
 const fs = require("fs");
 const path = require("path");
 
