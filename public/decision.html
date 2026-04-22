@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Passage — Decision</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f4f2;
+      --sidebar-bg: #ffffff;
+      --surface: #ffffff;
+      --border: #e8e7e4;
+      --text: #111111;
+      --muted: #6b6b6b;
+      --dim: #9b9b9b;
+      --green: #16a34a;
+      --green-bg: #f0fdf4;
+      --orange: #ea580c;
+      --orange-bg: #fff7ed;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --sans: 'Inter', system-ui, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 180px;
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 8px 0;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 14px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 5px;
+      margin: 1px 6px;
+      transition: background 0.12s, color 0.12s;
+      text-decoration: none;
+    }
+
+    .nav-item:hover { background: var(--bg); color: var(--text); }
+    .nav-item.active { background: var(--bg); color: var(--text); font-weight: 600; }
+
+    .nav-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-icon {
+      width: 14px;
+      height: 14px;
+      color: currentColor;
+      flex-shrink: 0;
+    }
+
+    .nav-badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--dim);
+      background: #f0f0ee;
+      border-radius: 3px;
+      padding: 1px 5px;
+    }
+
+    .nav-badge.live {
+      color: var(--green);
+      background: var(--green-bg);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .nav-badge.live::before {
+      content: '';
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .user-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #e0ddd8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: #555;
+      flex-shrink: 0;
+    }
+
+    .user-name {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role { font-size: 10px; color: var(--dim); }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      height: 44px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      flex-shrink: 0;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .breadcrumb-sep { color: var(--dim); font-size: 11px; }
+    .breadcrumb-current { color: var(--text); font-weight: 600; }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topbar-icon-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      transition: background 0.12s;
+    }
+
+    .topbar-icon-btn:hover { background: var(--bg); }
+
+    .topbar-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #e0ddd8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: #555;
+    }
+
+    /* ── APPLICANT HEADER ── */
+    .applicant-header {
+      padding: 14px 20px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .applicant-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .applicant-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e8e6e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #555;
+      flex-shrink: 0;
+    }
+
+    .applicant-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .applicant-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .app-id-badge {
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--dim);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+    }
+
+    .applicant-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── TAB BAR ── */
+    .tab-bar {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 0 20px;
+      flex-shrink: 0;
+    }
+
+    .tab-item {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--muted);
+      padding: 10px 0;
+      margin-right: 24px;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.12s;
+      text-decoration: none;
+    }
+
+    .tab-item:hover { color: var(--text); }
+    .tab-item.active {
+      color: var(--text);
+      font-weight: 600;
+      border-bottom-color: var(--text);
+    }
+
+    /* ── SCROLLABLE BODY ── */
+    .main-body {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+      padding: 24px 20px;
+    }
+
+    .main-body::-webkit-scrollbar { width: 3px; }
+    .main-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── DECISION CARD ── */
+    .decision-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--green);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+
+    .decision-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 8px;
+    }
+
+    .decision-verdict {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .decision-subnote {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .decision-rule {
+      height: 1px;
+      background: var(--border);
+      margin: 18px 0;
+    }
+
+    .evidence-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .evidence-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .evidence-icon {
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .evidence-icon.ok { color: var(--green); }
+    .evidence-icon.warn { color: var(--orange); }
+
+    /* ── TWO COLUMN LAYOUT ── */
+    .two-col {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .col-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .col-sidebar {
+      width: 280px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── SECTION CARDS ── */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .section-card-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .section-card-body {
+      padding: 16px;
+    }
+
+    /* ── DIM TABLE ── */
+    .dim-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .dim-table tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dim-table tr:last-child {
+      border-bottom: none;
+    }
+
+    .dim-table td {
+      padding: 9px 0;
+      vertical-align: middle;
+    }
+
+    .dim-table td:first-child {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      width: 55%;
+    }
+
+    .dt-score {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dt-dots {
+      display: flex;
+      gap: 3px;
+    }
+
+    .dt-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e5e4e1;
+    }
+
+    .dt-dot.green  { background: var(--green); }
+    .dt-dot.orange { background: var(--orange); }
+
+    .dt-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      min-width: 24px;
+    }
+
+    .dt-quality {
+      font-size: 11px;
+      color: var(--dim);
+      text-align: right;
+    }
+
+    .dt-quality.strong { color: var(--green); }
+    .dt-quality.medium { color: var(--muted); }
+    .dt-quality.weak   { color: var(--orange); }
+
+    /* ── REVIEWER NOTES ── */
+    .notes-textarea {
+      width: 100%;
+      min-height: 100px;
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      resize: vertical;
+      outline: none;
+      line-height: 1.6;
+    }
+
+    .notes-textarea:focus {
+      border-color: #aaa;
+    }
+
+    .notes-textarea::placeholder {
+      color: var(--dim);
+    }
+
+    /* ── SIDEBAR SECTION ── */
+    .sb-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+
+    .sb-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 12px;
+    }
+
+    /* ── DECISION BUTTONS ── */
+    .decision-btn {
+      display: block;
+      width: 100%;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 11px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      transition: opacity 0.12s, background 0.12s;
+      margin-bottom: 8px;
+    }
+
+    .decision-btn:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .decision-btn.admit {
+      background: var(--green);
+      color: #fff;
+      border: none;
+    }
+
+    .decision-btn.admit:hover { opacity: 0.88; }
+
+    .decision-btn.request {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .decision-btn.request:hover { background: var(--bg); }
+
+    .decision-btn.decline {
+      background: var(--surface);
+      color: var(--red);
+      border: 1px solid var(--red);
+    }
+
+    .decision-btn.decline:hover { background: var(--red-bg); }
+
+    .decision-logged-note {
+      font-size: 11px;
+      color: var(--dim);
+      text-align: center;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    /* ── DECISION CONFIRMED STATE ── */
+    .decision-confirmed {
+      display: none;
+      border-radius: 6px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .decision-confirmed.admit-color  { background: var(--green-bg); border: 1px solid #bbf7d0; }
+    .decision-confirmed.request-color { background: var(--bg); border: 1px solid var(--border); }
+    .decision-confirmed.decline-color { background: var(--red-bg); border: 1px solid #fecaca; }
+
+    .decision-confirmed-icon {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .decision-confirmed-label {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .decision-confirmed-label.admit-color  { color: var(--green); }
+    .decision-confirmed-label.request-color { color: var(--text); }
+    .decision-confirmed-label.decline-color { color: var(--red); }
+
+    .decision-confirmed-ts {
+      font-size: 11px;
+      color: var(--dim);
+    }
+
+    /* ── RS FIELDS ── */
+    .rs-field {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 7px;
+    }
+
+    .rs-field:last-child { margin-bottom: 0; }
+
+    .rs-field-key {
+      font-size: 11.5px;
+      color: var(--dim);
+    }
+
+    .rs-field-val {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .sb-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 10px 0;
+    }
+
+    .routing-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .routing-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #e0ddd8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 700;
+      color: #555;
+      flex-shrink: 0;
+    }
+
+    .routing-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .routing-meta {
+      font-size: 10.5px;
+      color: var(--dim);
+    }
+
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .fadein { animation: fadein 0.3s ease forwards; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo" style="padding:14px 14px 12px; border-bottom:1px solid var(--border);">
+      <svg width="110" height="26" viewBox="0 0 343 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0V59.661H12.2034V43.3898H23.0508C28.8047 43.3898 34.3229 41.1041 38.3915 37.0355C42.46 32.967 44.7458 27.4488 44.7458 21.6949C44.7458 15.9411 42.4601 10.4229 38.3915 6.3543C34.3229 2.28571 28.8047 0 23.0508 0H0ZM21.6972 32.5424H12.2034V10.8475H21.6949C24.5718 10.8475 27.3309 11.9903 29.3652 14.0246C31.3995 16.0589 32.5424 18.818 32.5424 21.6949C32.5424 24.5718 31.3995 27.3309 29.3652 29.3652C27.3315 31.399 24.5733 32.5418 21.6972 32.5424Z" fill="#111111"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M66.4407 61.017C54.9153 61.017 44.7458 50.8476 44.7458 37.9662C44.7458 25.0848 54.9153 14.9153 66.4407 14.9153C74.5763 14.9153 77.2881 17.6271 79.322 19.661L80.678 16.2713H90.8475V59.6611H80.678L79.322 56.2712C77.2881 58.3051 74.5762 61.017 66.4407 61.017ZM56.2712 37.9662C56.2712 31.1865 61.9686 25.7628 68.7482 25.7628C75.5279 25.7628 80.678 31.1865 80.678 37.9662C80.678 44.7459 75.2542 50.1696 68.4746 50.1696C61.6949 50.1696 56.2712 44.7459 56.2712 37.9662Z" fill="#111111"/>
+        <path d="M105.514 39.845L105.495 39.8377L105.476 39.8315C99.8155 38.0232 95.3878 34.4283 95.3878 28.8773C95.3878 20.5763 102.946 14.9153 111.91 14.9153C114.758 14.9153 118.603 15.4838 121.85 17.4382C124.919 19.2849 127.495 22.3895 128.19 27.5593H116.518C116.437 27.0421 116.257 26.3709 115.792 25.7638C115.083 24.8383 113.834 24.1993 111.75 24.1993C110.2 24.1993 109.077 24.6909 108.34 25.4279C107.615 26.1529 107.312 27.0689 107.312 27.8373C107.312 29.3957 108.388 30.5138 109.716 31.3258C111.057 32.1452 112.831 32.7654 114.598 33.2876L114.609 33.2907C118.397 34.3383 122.157 35.3927 124.986 37.3361C127.754 39.238 129.632 41.9951 129.632 46.5573C129.632 55.4049 121.85 60.9993 112.23 60.9993C108.956 60.9993 104.872 60.2562 101.481 58.1234C98.2696 56.1039 95.648 52.8225 94.9152 47.6353H106.784C107.223 49.5582 108.402 50.6039 109.589 51.1443C110.843 51.7153 112.082 51.7153 112.385 51.7153H112.39C113.627 51.7153 114.922 51.3644 115.927 50.6904C116.941 50.0108 117.708 48.9615 117.708 47.5973C117.708 46.8078 117.554 46.1121 117.196 45.4906C116.841 44.8736 116.314 44.3808 115.651 43.9474C114.376 43.114 112.438 42.4067 109.848 41.4614L109.749 41.4254C108.509 40.9726 107.103 40.4595 105.514 39.845Z" fill="#111111"/>
+        <path d="M142.125 39.845L142.106 39.8377L142.086 39.8315C136.426 38.0232 131.998 34.4283 131.998 28.8773C131.998 20.5763 139.556 14.9153 148.52 14.9153C151.368 14.9153 155.213 15.4838 158.46 17.4382C161.529 19.2849 164.105 22.3895 164.8 27.5593H153.128C153.048 27.0421 152.867 26.3709 152.402 25.7638C151.693 24.8383 150.444 24.1993 148.36 24.1993C146.81 24.1993 145.688 24.6909 144.951 25.4279C144.226 26.1529 143.922 27.0689 143.922 27.8373C143.922 29.3957 144.998 30.5138 146.326 31.3258C147.667 32.1452 149.441 32.7654 151.208 33.2876L151.219 33.2907C155.007 34.3383 158.768 35.3927 161.596 37.3361C164.364 39.238 166.242 41.9951 166.242 46.5573C166.242 55.4049 158.46 60.9993 148.84 60.9993C145.566 60.9993 141.482 60.2562 138.091 58.1234C134.88 56.1039 132.258 52.8225 131.525 47.6353H143.395C143.833 49.5582 145.012 50.6039 146.199 51.1443C147.453 51.7153 148.692 51.7153 148.996 51.7153H149C150.237 51.7153 151.532 51.3644 152.538 50.6904C153.551 50.0108 154.318 48.9615 154.318 47.5973C154.318 46.8078 154.164 46.1121 153.806 45.4906C153.451 44.8736 152.924 44.3808 152.261 43.9474C150.986 43.114 149.048 42.4067 146.458 41.4614L146.359 41.4254C145.119 40.9726 143.713 40.4595 142.125 39.845Z" fill="#111111"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M168.136 37.9662C168.136 50.8476 178.305 61.017 189.83 61.017C197.966 61.017 200.678 58.3051 202.712 56.2712L204.068 59.6611H214.237V16.2713H204.068L202.712 19.661C200.678 17.6271 197.966 14.9153 189.83 14.9153C178.305 14.9153 168.136 25.0848 168.136 37.9662ZM192.138 25.7628C185.358 25.7628 179.661 31.1865 179.661 37.9662C179.661 44.7459 185.085 50.1696 191.864 50.1696C198.644 50.1696 204.068 44.7459 204.068 37.9662C204.068 31.1865 198.918 25.7628 192.138 25.7628Z" fill="#111111"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M240 61.017C228.475 61.017 218.305 50.8476 218.305 37.9662C218.305 25.0848 228.475 14.9153 240 14.9153C248.136 14.9153 250.847 17.6271 252.881 19.661L254.237 16.2713H264.407V58.3051C264.342 60.9406 264.023 64.1081 262.808 67.2042C261.295 71.0625 258.487 74.5231 253.809 76.9061C246.338 80.7113 232.813 82.095 221.518 74.186L227.74 65.3005C235.216 70.5355 244.368 69.5411 248.886 67.2402C251.124 66.0999 252.135 64.7104 252.71 63.2435C253.368 61.5664 253.559 59.5136 253.559 56.9492V56.2712C251.525 58.3051 248.136 61.017 240 61.017ZM229.83 37.9662C229.83 31.1865 235.528 25.7628 242.308 25.7628C249.087 25.7628 254.237 31.1865 254.237 37.9662C254.237 44.7459 248.814 50.1696 242.034 50.1696C235.254 50.1696 229.83 44.7459 229.83 37.9662Z" fill="#111111"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M268.475 37.9661C268.475 50.6967 278.795 61.017 291.525 61.017C293.176 61.0173 302.398 61.0191 310.044 54.2231L302.837 46.1156C298.333 50.1198 292.681 50.1695 291.525 50.1695C286.507 50.1695 282.238 46.7736 280.656 42.0339H314.218C314.454 40.7135 314.576 39.3541 314.576 37.9661C314.576 25.2355 304.256 14.9153 291.525 14.9153C278.795 14.9153 268.475 25.2355 268.475 37.9661ZM302.395 33.8983C300.813 29.1585 296.544 25.7627 291.525 25.7627C286.507 25.7627 282.238 29.1585 280.656 33.8983H302.395Z" fill="#111111"/>
+        <circle cx="332.76" cy="51" r="10" fill="#FF6F00"/>
+      </svg>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="#">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/>
+            <rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/>
+          </svg>
+          Intake
+        </div>
+        <span class="nav-badge">47</span>
+      </a>
+
+      <a class="nav-item" href="/interview.html">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="8" cy="6" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+          </svg>
+          Interviews
+        </div>
+        <span class="nav-badge live">3 live</span>
+      </a>
+
+      <a class="nav-item" href="/review.html">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M2 4h12M2 8h8M2 12h6"/>
+          </svg>
+          Review
+        </div>
+        <span class="nav-badge">12</span>
+      </a>
+
+      <a class="nav-item active" href="#">
+        <div class="nav-item-left">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M8 2l1.5 4.5H14l-3.7 2.7 1.4 4.3L8 11l-3.7 2.5 1.4-4.3L2 6.5h4.5z"/>
+          </svg>
+          Decisions
+        </div>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-avatar">MA</div>
+      <div>
+        <div class="user-name">Maya Adeyemi</div>
+        <div class="user-role">Reviewer</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="main">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span>Review</span>
+        <span class="breadcrumb-sep">›</span>
+        <span>Applicants</span>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current">Martin Basiri</span>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-icon-btn" title="Search">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5"/>
+          </svg>
+        </button>
+        <div class="topbar-avatar">MA</div>
+      </div>
+    </div>
+
+    <!-- APPLICANT HEADER -->
+    <div class="applicant-header">
+      <div class="applicant-left">
+        <div class="applicant-avatar">MB</div>
+        <div>
+          <div class="applicant-name-row">
+            <span class="applicant-name">Martin Basiri</span>
+            <span class="app-id-badge">APP-0042</span>
+          </div>
+          <div class="applicant-subtitle">Computer Science, PG · University of Toronto · Fall 2026</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <a href="/review.html?demo=1" style="font-family:inherit;font-size:12px;font-weight:500;padding:7px 14px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;">
+          View Assessment
+        </a>
+      </div>
+    </div>
+
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+      <a class="tab-item" href="/interview.html">Interview</a>
+      <a class="tab-item" href="/review.html?demo=1">Assessment</a>
+      <span class="tab-item active">Decision</span>
+    </div>
+
+    <!-- MAIN BODY -->
+    <div class="main-body fadein">
+
+      <!-- AI DECISION CARD -->
+      <div class="decision-card">
+        <div class="decision-eyebrow">AI Recommendation</div>
+        <div class="decision-verdict">Admit, conditional</div>
+        <div class="decision-subnote">On receipt of an employer support letter or a revised funding declaration.</div>
+        <div class="decision-rule"></div>
+        <div class="evidence-list">
+          <div class="evidence-item">
+            <span class="evidence-icon ok">✓</span>
+            <span><strong>Strong program fit</strong> — CS background aligns directly with program requirements and research track.</span>
+          </div>
+          <div class="evidence-item">
+            <span class="evidence-icon ok">✓</span>
+            <span><strong>Solid track record</strong> — 3 years software industry experience with named roles and technical responsibilities.</span>
+          </div>
+          <div class="evidence-item">
+            <span class="evidence-icon warn">⚠</span>
+            <span><strong>Funding gap</strong> — CA$600/month employer contribution is informal, no letter on file. Backup plan (TA role) unconfirmed.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TWO-COLUMN LAYOUT -->
+      <div class="two-col">
+
+        <!-- MAIN COLUMN -->
+        <div class="col-main">
+
+          <!-- DIMENSION SUMMARY -->
+          <div class="section-card">
+            <div class="section-card-header">Dimension Summary</div>
+            <div class="section-card-body" style="padding:0;">
+              <table class="dim-table" style="padding:0 16px;">
+                <tbody>
+                  <tr>
+                    <td style="padding-left:16px;">Program goals</td>
+                    <td>
+                      <div class="dt-score">
+                        <div class="dt-dots">
+                          <div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot"></div>
+                        </div>
+                        <span class="dt-label">4/5</span>
+                      </div>
+                    </td>
+                    <td class="dt-quality strong" style="padding-right:16px;">Strong</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px;">Job readiness</td>
+                    <td>
+                      <div class="dt-score">
+                        <div class="dt-dots">
+                          <div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div>
+                        </div>
+                        <span class="dt-label">5/5</span>
+                      </div>
+                    </td>
+                    <td class="dt-quality strong" style="padding-right:16px;">Strong</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px;">Grit</td>
+                    <td>
+                      <div class="dt-score">
+                        <div class="dt-dots">
+                          <div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot"></div><div class="dt-dot"></div>
+                        </div>
+                        <span class="dt-label">3/5</span>
+                      </div>
+                    </td>
+                    <td class="dt-quality medium" style="padding-right:16px;">Medium</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px;">Education fit</td>
+                    <td>
+                      <div class="dt-score">
+                        <div class="dt-dots">
+                          <div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div>
+                        </div>
+                        <span class="dt-label">5/5</span>
+                      </div>
+                    </td>
+                    <td class="dt-quality strong" style="padding-right:16px;">Strong</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px;">Trustworthiness</td>
+                    <td>
+                      <div class="dt-score">
+                        <div class="dt-dots">
+                          <div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot"></div><div class="dt-dot"></div>
+                        </div>
+                        <span class="dt-label">3/5</span>
+                      </div>
+                    </td>
+                    <td class="dt-quality medium" style="padding-right:16px;">Medium</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px;">Financial resources</td>
+                    <td>
+                      <div class="dt-score">
+                        <div class="dt-dots">
+                          <div class="dt-dot orange"></div><div class="dt-dot orange"></div><div class="dt-dot"></div><div class="dt-dot"></div><div class="dt-dot"></div>
+                        </div>
+                        <span class="dt-label">2/5</span>
+                      </div>
+                    </td>
+                    <td class="dt-quality weak" style="padding-right:16px;">Weak</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px;">Network support</td>
+                    <td>
+                      <div class="dt-score">
+                        <div class="dt-dots">
+                          <div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot"></div><div class="dt-dot"></div>
+                        </div>
+                        <span class="dt-label">3/5</span>
+                      </div>
+                    </td>
+                    <td class="dt-quality medium" style="padding-right:16px;">Medium</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px;">Statement of purpose</td>
+                    <td>
+                      <div class="dt-score">
+                        <div class="dt-dots">
+                          <div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot"></div>
+                        </div>
+                        <span class="dt-label">4/5</span>
+                      </div>
+                    </td>
+                    <td class="dt-quality strong" style="padding-right:16px;">Strong</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px;">Industry experience</td>
+                    <td>
+                      <div class="dt-score">
+                        <div class="dt-dots">
+                          <div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div><div class="dt-dot green"></div>
+                        </div>
+                        <span class="dt-label">5/5</span>
+                      </div>
+                    </td>
+                    <td class="dt-quality strong" style="padding-right:16px;">Strong</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- REVIEWER NOTES -->
+          <div class="section-card">
+            <div class="section-card-header">Reviewer Notes</div>
+            <div class="section-card-body">
+              <textarea class="notes-textarea" placeholder="Add notes for the file (visible to the team, not the applicant)…"></textarea>
+            </div>
+          </div>
+
+        </div><!-- /col-main -->
+
+        <!-- SIDEBAR COLUMN -->
+        <div class="col-sidebar">
+
+          <!-- YOUR DECISION -->
+          <div class="sb-section">
+            <div class="sb-label">Your Decision</div>
+
+            <div id="decision-buttons">
+              <button class="decision-btn admit" onclick="recordDecision('admit')">Issue conditional offer</button>
+              <button class="decision-btn request" onclick="recordDecision('request')">Request documents first</button>
+              <button class="decision-btn decline" onclick="recordDecision('decline')">Decline application</button>
+            </div>
+
+            <div class="decision-confirmed admit-color" id="decision-confirmed-admit">
+              <div class="decision-confirmed-icon">✓</div>
+              <div class="decision-confirmed-label admit-color">Conditional offer issued</div>
+              <div class="decision-confirmed-ts" id="decision-ts-admit"></div>
+            </div>
+
+            <div class="decision-confirmed request-color" id="decision-confirmed-request">
+              <div class="decision-confirmed-icon" style="color:var(--text);">&#9993;</div>
+              <div class="decision-confirmed-label request-color">Documents requested</div>
+              <div class="decision-confirmed-ts" id="decision-ts-request"></div>
+            </div>
+
+            <div class="decision-confirmed decline-color" id="decision-confirmed-decline">
+              <div class="decision-confirmed-icon" style="color:var(--red);">&#x2715;</div>
+              <div class="decision-confirmed-label decline-color">Application declined</div>
+              <div class="decision-confirmed-ts" id="decision-ts-decline"></div>
+            </div>
+
+            <div class="decision-logged-note">Decision is logged and sent to the applicant.</div>
+          </div>
+
+          <!-- APPLICANT INFO -->
+          <div class="sb-section">
+            <div class="sb-label">Applicant</div>
+            <div class="rs-field">
+              <span class="rs-field-key">Name</span>
+              <span class="rs-field-val">Martin Basiri</span>
+            </div>
+            <div class="sb-divider"></div>
+            <div class="rs-field">
+              <span class="rs-field-key">Program</span>
+              <span class="rs-field-val">Computer Science, PG</span>
+            </div>
+            <div class="sb-divider"></div>
+            <div class="rs-field">
+              <span class="rs-field-key">Intake</span>
+              <span class="rs-field-val">Fall 2026</span>
+            </div>
+            <div class="sb-divider"></div>
+            <div class="rs-field">
+              <span class="rs-field-key">Interview date</span>
+              <span class="rs-field-val">Apr 22, 2026</span>
+            </div>
+          </div>
+
+          <!-- ROUTING -->
+          <div class="sb-section">
+            <div class="sb-label">Routing</div>
+            <div class="routing-row">
+              <div class="routing-avatar">MA</div>
+              <div>
+                <div class="routing-name">Maya Adeyemi</div>
+                <div class="routing-meta">SLA 24h · assigned</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /col-sidebar -->
+      </div><!-- /two-col -->
+
+    </div><!-- /main-body -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+function recordDecision(type) {
+  // Hide buttons
+  document.getElementById('decision-buttons').style.display = 'none';
+
+  // Build timestamp
+  const now = new Date();
+  const ts = 'Sent to applicant · ' + now.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' });
+
+  // Show the correct confirmation and set timestamp
+  const el = document.getElementById('decision-confirmed-' + type);
+  const tsEl = document.getElementById('decision-ts-' + type);
+  if (tsEl) tsEl.textContent = ts;
+  if (el) el.style.display = 'block';
+}
+</script>
+</body>
+</html>

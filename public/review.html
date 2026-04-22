@@ -56,44 +56,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 16px 14px 14px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .logo-mark {
-      width: 26px;
-      height: 26px;
-      background: #111111;
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .logo-mark span {
-      color: #ffffff;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .logo-text {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.01em;
-    }
-
-    .logo-ai-pill {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      color: var(--dim);
-      background: #f0f0ee;
-      border-radius: 3px;
-      padding: 1px 5px;
-      margin-left: 2px;
     }
 
     .sidebar-nav {
@@ -107,7 +69,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 7px 14px;
-      font-size: 12.5px;
+      font-size: 13.5px;
       font-weight: 500;
       color: var(--muted);
       cursor: pointer;
@@ -315,7 +277,7 @@
     }
 
     .applicant-name {
-      font-size: 15px;
+      font-size: 17px;
       font-weight: 700;
       color: var(--text);
       letter-spacing: -0.01em;
@@ -332,7 +294,7 @@
     }
 
     .applicant-subtitle {
-      font-size: 11.5px;
+      font-size: 13px;
       color: var(--muted);
       margin-top: 2px;
     }
@@ -373,7 +335,7 @@
     }
 
     .tab-item {
-      font-size: 12.5px;
+      font-size: 13.5px;
       font-weight: 500;
       color: var(--muted);
       padding: 10px 0;
@@ -645,7 +607,7 @@
     .dim-row:hover { background: #fafaf9; }
 
     .dim-name {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 500;
       color: var(--text);
       width: 170px;
@@ -653,7 +615,7 @@
     }
 
     .dim-short {
-      font-size: 11.5px;
+      font-size: 12.5px;
       color: var(--dim);
       flex: 1;
       min-width: 0;
@@ -746,7 +708,7 @@
     .excerpt-speaker.student { color: var(--green); }
 
     .excerpt-text {
-      font-size: 12px;
+      font-size: 13px;
       line-height: 1.65;
       color: var(--muted);
     }
@@ -880,10 +842,17 @@
 <div class="app">
   <!-- ── SIDEBAR ── -->
   <aside class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-mark"><span>P</span></div>
-      <span class="logo-text">Passage</span>
-      <span class="logo-ai-pill">AI</span>
+    <div class="sidebar-logo" style="padding:14px 14px 12px; border-bottom:1px solid var(--border);">
+      <svg width="110" height="26" viewBox="0 0 343 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0V59.661H12.2034V43.3898H23.0508C28.8047 43.3898 34.3229 41.1041 38.3915 37.0355C42.46 32.967 44.7458 27.4488 44.7458 21.6949C44.7458 15.9411 42.4601 10.4229 38.3915 6.3543C34.3229 2.28571 28.8047 0 23.0508 0H0ZM21.6972 32.5424H12.2034V10.8475H21.6949C24.5718 10.8475 27.3309 11.9903 29.3652 14.0246C31.3995 16.0589 32.5424 18.818 32.5424 21.6949C32.5424 24.5718 31.3995 27.3309 29.3652 29.3652C27.3315 31.399 24.5733 32.5418 21.6972 32.5424Z" fill="#111111"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M66.4407 61.017C54.9153 61.017 44.7458 50.8476 44.7458 37.9662C44.7458 25.0848 54.9153 14.9153 66.4407 14.9153C74.5763 14.9153 77.2881 17.6271 79.322 19.661L80.678 16.2713H90.8475V59.6611H80.678L79.322 56.2712C77.2881 58.3051 74.5762 61.017 66.4407 61.017ZM56.2712 37.9662C56.2712 31.1865 61.9686 25.7628 68.7482 25.7628C75.5279 25.7628 80.678 31.1865 80.678 37.9662C80.678 44.7459 75.2542 50.1696 68.4746 50.1696C61.6949 50.1696 56.2712 44.7459 56.2712 37.9662Z" fill="#111111"/>
+        <path d="M105.514 39.845L105.495 39.8377L105.476 39.8315C99.8155 38.0232 95.3878 34.4283 95.3878 28.8773C95.3878 20.5763 102.946 14.9153 111.91 14.9153C114.758 14.9153 118.603 15.4838 121.85 17.4382C124.919 19.2849 127.495 22.3895 128.19 27.5593H116.518C116.437 27.0421 116.257 26.3709 115.792 25.7638C115.083 24.8383 113.834 24.1993 111.75 24.1993C110.2 24.1993 109.077 24.6909 108.34 25.4279C107.615 26.1529 107.312 27.0689 107.312 27.8373C107.312 29.3957 108.388 30.5138 109.716 31.3258C111.057 32.1452 112.831 32.7654 114.598 33.2876L114.609 33.2907C118.397 34.3383 122.157 35.3927 124.986 37.3361C127.754 39.238 129.632 41.9951 129.632 46.5573C129.632 55.4049 121.85 60.9993 112.23 60.9993C108.956 60.9993 104.872 60.2562 101.481 58.1234C98.2696 56.1039 95.648 52.8225 94.9152 47.6353H106.784C107.223 49.5582 108.402 50.6039 109.589 51.1443C110.843 51.7153 112.082 51.7153 112.385 51.7153H112.39C113.627 51.7153 114.922 51.3644 115.927 50.6904C116.941 50.0108 117.708 48.9615 117.708 47.5973C117.708 46.8078 117.554 46.1121 117.196 45.4906C116.841 44.8736 116.314 44.3808 115.651 43.9474C114.376 43.114 112.438 42.4067 109.848 41.4614L109.749 41.4254C108.509 40.9726 107.103 40.4595 105.514 39.845Z" fill="#111111"/>
+        <path d="M142.125 39.845L142.106 39.8377L142.086 39.8315C136.426 38.0232 131.998 34.4283 131.998 28.8773C131.998 20.5763 139.556 14.9153 148.52 14.9153C151.368 14.9153 155.213 15.4838 158.46 17.4382C161.529 19.2849 164.105 22.3895 164.8 27.5593H153.128C153.048 27.0421 152.867 26.3709 152.402 25.7638C151.693 24.8383 150.444 24.1993 148.36 24.1993C146.81 24.1993 145.688 24.6909 144.951 25.4279C144.226 26.1529 143.922 27.0689 143.922 27.8373C143.922 29.3957 144.998 30.5138 146.326 31.3258C147.667 32.1452 149.441 32.7654 151.208 33.2876L151.219 33.2907C155.007 34.3383 158.768 35.3927 161.596 37.3361C164.364 39.238 166.242 41.9951 166.242 46.5573C166.242 55.4049 158.46 60.9993 148.84 60.9993C145.566 60.9993 141.482 60.2562 138.091 58.1234C134.88 56.1039 132.258 52.8225 131.525 47.6353H143.395C143.833 49.5582 145.012 50.6039 146.199 51.1443C147.453 51.7153 148.692 51.7153 148.996 51.7153H149C150.237 51.7153 151.532 51.3644 152.538 50.6904C153.551 50.0108 154.318 48.9615 154.318 47.5973C154.318 46.8078 154.164 46.1121 153.806 45.4906C153.451 44.8736 152.924 44.3808 152.261 43.9474C150.986 43.114 149.048 42.4067 146.458 41.4614L146.359 41.4254C145.119 40.9726 143.713 40.4595 142.125 39.845Z" fill="#111111"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M168.136 37.9662C168.136 50.8476 178.305 61.017 189.83 61.017C197.966 61.017 200.678 58.3051 202.712 56.2712L204.068 59.6611H214.237V16.2713H204.068L202.712 19.661C200.678 17.6271 197.966 14.9153 189.83 14.9153C178.305 14.9153 168.136 25.0848 168.136 37.9662ZM192.138 25.7628C185.358 25.7628 179.661 31.1865 179.661 37.9662C179.661 44.7459 185.085 50.1696 191.864 50.1696C198.644 50.1696 204.068 44.7459 204.068 37.9662C204.068 31.1865 198.918 25.7628 192.138 25.7628Z" fill="#111111"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M240 61.017C228.475 61.017 218.305 50.8476 218.305 37.9662C218.305 25.0848 228.475 14.9153 240 14.9153C248.136 14.9153 250.847 17.6271 252.881 19.661L254.237 16.2713H264.407V58.3051C264.342 60.9406 264.023 64.1081 262.808 67.2042C261.295 71.0625 258.487 74.5231 253.809 76.9061C246.338 80.7113 232.813 82.095 221.518 74.186L227.74 65.3005C235.216 70.5355 244.368 69.5411 248.886 67.2402C251.124 66.0999 252.135 64.7104 252.71 63.2435C253.368 61.5664 253.559 59.5136 253.559 56.9492V56.2712C251.525 58.3051 248.136 61.017 240 61.017ZM229.83 37.9662C229.83 31.1865 235.528 25.7628 242.308 25.7628C249.087 25.7628 254.237 31.1865 254.237 37.9662C254.237 44.7459 248.814 50.1696 242.034 50.1696C235.254 50.1696 229.83 44.7459 229.83 37.9662Z" fill="#111111"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M268.475 37.9661C268.475 50.6967 278.795 61.017 291.525 61.017C293.176 61.0173 302.398 61.0191 310.044 54.2231L302.837 46.1156C298.333 50.1198 292.681 50.1695 291.525 50.1695C286.507 50.1695 282.238 46.7736 280.656 42.0339H314.218C314.454 40.7135 314.576 39.3541 314.576 37.9661C314.576 25.2355 304.256 14.9153 291.525 14.9153C278.795 14.9153 268.475 25.2355 268.475 37.9661ZM302.395 33.8983C300.813 29.1585 296.544 25.7627 291.525 25.7627C286.507 25.7627 282.238 29.1585 280.656 33.8983H302.395Z" fill="#111111"/>
+        <circle cx="332.76" cy="51" r="10" fill="#FF6F00"/>
+      </svg>
     </div>
 
     <nav class="sidebar-nav">
@@ -924,48 +893,6 @@
             <path d="M8 2l1.5 4.5H14l-3.7 2.7 1.4 4.3L8 11l-3.7 2.5 1.4-4.3L2 6.5h4.5z"/>
           </svg>
           Decisions
-        </div>
-      </a>
-
-      <div class="nav-divider">
-        <div class="nav-divider-line"></div>
-        <span class="nav-divider-label">Setup</span>
-        <div class="nav-divider-line"></div>
-      </div>
-
-      <a class="nav-item" href="#">
-        <div class="nav-item-left">
-          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M8 5v6"/>
-          </svg>
-          Programs
-        </div>
-      </a>
-
-      <a class="nav-item" href="#">
-        <div class="nav-item-left">
-          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M8 2a6 6 0 100 12A6 6 0 008 2z"/><path d="M8 6v4M8 10h.01"/>
-          </svg>
-          Scoring
-        </div>
-      </a>
-
-      <a class="nav-item" href="#">
-        <div class="nav-item-left">
-          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M3 13c0-2.8 2.2-5 5-5s5 2.2 5 5M8 8a3 3 0 100-6 3 3 0 000 6z"/>
-          </svg>
-          Team
-        </div>
-      </a>
-
-      <a class="nav-item" href="#">
-        <div class="nav-item-left">
-          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M2 8h2M12 8h2M8 2v2M8 12v2M4.1 4.1l1.4 1.4M10.5 10.5l1.4 1.4M4.1 11.9l1.4-1.4M10.5 5.5l1.4-1.4"/>
-          </svg>
-          Integrations
         </div>
       </a>
     </nav>
@@ -1013,21 +940,21 @@
           <div class="applicant-subtitle" id="applicant-subtitle">—</div>
         </div>
       </div>
-      <div>
+      <div style="display:flex;align-items:center;gap:8px;">
         <div class="btn-report-pending" id="btn-report-status">
           <span class="pending-dot"></span>
           Report pending
         </div>
+        <a href="/decision.html?demo=1" style="font-family:inherit;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;border:none;background:#111111;color:#fff;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+          Make Decision →
+        </a>
       </div>
     </div>
 
     <!-- TAB BAR -->
     <div class="tab-bar">
-      <span class="tab-item">Overview</span>
-      <span class="tab-item">Documents <span class="tab-count">7</span></span>
-      <span class="tab-item">Interview</span>
+      <span class="tab-item" style="cursor:pointer" onclick="window.location.href='/interview.html'">Interview</span>
       <span class="tab-item active">Assessment</span>
-      <span class="tab-item">Activity</span>
     </div>
 
     <!-- SCROLLABLE BODY -->
@@ -1382,12 +1309,14 @@ function renderResults(data) {
   document.getElementById('bc-name').textContent = name;
   document.getElementById('applicant-name').textContent = name;
   document.getElementById('applicant-avatar').textContent = initials;
-  document.getElementById('app-id-badge').textContent = meta?.conversation_id
+  document.getElementById('app-id-badge').textContent = meta?.app_id
+    ? meta.app_id
+    : meta?.conversation_id
     ? '…' + meta.conversation_id.slice(-8)
     : '—';
   document.getElementById('applicant-subtitle').textContent = [
     meta?.program_name || '',
-    meta?.institution || 'Humber College',
+    meta?.institution || '',
     meta?.intake || '',
   ].filter(Boolean).join(' · ');
 
@@ -1421,50 +1350,51 @@ function renderResults(data) {
   document.getElementById('state-results').classList.add('fadein');
 }
 
-// ── Demo data (Priya Shah) ────────────────────────────────────────────────────
+// ── Demo data (Martin Basiri) ─────────────────────────────────────────────────
 const DEMO_DATA = {
   meta: {
-    conversation_id: 'conv_demo_priya_shah_001',
+    conversation_id: 'conv_demo_martin_basiri_001',
+    app_id: 'APP-0042',
     agent_name: 'Passage AI',
-    duration_secs: 497,
+    duration_secs: 613,
     termination_reason: 'end_call_completed',
     analyzed_at: new Date().toISOString(),
-    applicant_name: 'Priya Shah',
-    program_name: 'Supply Chain Management, PG',
-    institution: 'Humber College',
+    applicant_name: 'Martin Basiri',
+    program_name: 'Computer Science, PG',
+    institution: 'University of Toronto',
     intake: 'Fall 2026',
   },
   transcript: [
-    { role: 'agent',   text: "Hi Priya, thanks for joining today. Can you tell me what drew you to the Supply Chain Management program at Humber?", ts: '0:05' },
-    { role: 'student', text: "I've been working in logistics for two years and I want to move into a management role. The program's focus on Canadian supply chain regulations and the co-op placement really stood out to me.", ts: '0:18' },
-    { role: 'agent',   text: 'How are you planning to cover tuition and living costs during the program?', ts: '2:45' },
-    { role: 'student', text: "Tuition is covered by family savings. For living costs, my father's employer is topping up about CA$600 a month, and I'll take a part-time job on campus.", ts: '3:02' },
-    { role: 'agent',   text: 'Do you have a support letter from them, and is that support committed for the full year?', ts: '3:28' },
-    { role: 'student', text: "Honestly, I don't have a letter yet — it's an informal arrangement with his manager.", ts: '3:45' },
-    { role: 'agent',   text: "If that arrangement falls through, what's your backup plan for living expenses?", ts: '4:10' },
-    { role: 'student', text: "I'd probably increase my part-time hours or borrow from family, but I haven't worked out the exact details yet.", ts: '4:22' },
+    { role: 'agent',   text: "Hi Martin, thanks for joining today. Can you tell me what drew you to the Computer Science program at the University of Toronto?", ts: '0:05' },
+    { role: 'student', text: "I've been working as a software engineer for three years and I want to move into research and applied ML. U of T's CS program has a strong AI research track and the connections to the industry here are exactly what I'm looking for.", ts: '0:20' },
+    { role: 'agent',   text: 'How are you planning to cover tuition and living costs during the program?', ts: '2:55' },
+    { role: 'student', text: "Tuition is covered by family savings. For living costs, my employer said they'd contribute about CA$600 a month since I'll still be doing some part-time consulting for them.", ts: '3:12' },
+    { role: 'agent',   text: 'Do you have a written agreement or support letter for that arrangement, and is it confirmed for the full program duration?', ts: '3:38' },
+    { role: 'student', text: "Not a formal letter yet — it's something my manager mentioned informally. I'm planning to follow up before the semester starts.", ts: '3:55' },
+    { role: 'agent',   text: "If that falls through, what's your backup plan for covering living expenses?", ts: '4:20' },
+    { role: 'student', text: "I'd look for a TA position or part-time research role in the department. I haven't confirmed anything yet but those positions are usually available.", ts: '4:35' },
   ],
   analysis: {
-    executive_summary: "Priya Shah presents as a focused and well-prepared candidate for the Supply Chain Management program at Humber College. She brings two years of logistics experience and demonstrates clear alignment between her career goals and the program's offerings. However, her funding plan contains a significant gap: a CA$600/month employer contribution from her father's workplace is unconfirmed and undocumented. Her backup plan for living costs is underdeveloped. Overall signals are positive but the funding gap requires clarification before a final decision.",
+    executive_summary: "Martin Basiri is a strong candidate for the Computer Science PG program at the University of Toronto. He brings three years of software industry experience and demonstrates clear alignment between his career goals and the program's AI/research focus. His academic background and technical skills are directly relevant. However, his funding plan has a gap: a CA$600/month employer contribution is informal with no letter on file, and his backup plan relies on TA positions he has not yet secured. Overall profile is strong but the funding documentation requires clarification before final decision.",
     dimensions: {
-      program_fit:          { quality: 'strong', rationale: 'Specific knowledge of program co-op structure and Canadian regulations focus. Clear connection to career goals.', source: 'interview' },
-      job_readiness:        { quality: 'strong', rationale: 'Two years of direct logistics experience; targeting a management role with a clear program-to-career pathway.', source: 'interview' },
-      grit:                 { quality: 'medium', rationale: 'Mentioned managing a relocation independently, but gave vague responses to adversity follow-ups.', source: 'interview' },
-      education_fit:        { quality: 'strong', rationale: 'Business undergraduate degree with relevant quantitative coursework; directly applicable to program requirements.', source: 'interview' },
-      trustworthiness:      { quality: 'medium', rationale: 'Consistent across most answers; proactively disclosed the informal nature of employer support without prompting.', source: 'interview' },
-      financial_resources:  { quality: 'weak',   rationale: 'Tuition covered by family savings (confirmed), but CA$600/month living support is informal with no letter. Backup plan is vague.', source: 'interview' },
-      network_support:      { quality: 'medium', rationale: 'Family savings committed for tuition; employer top-up mentioned but unconfirmed. No other support sources identified.', source: 'interview' },
-      risk_level:           { level: 'medium',   rationale: 'Strong academic and professional profile undermined by an unconfirmed living cost contribution and no concrete backup plan.', source: 'interview' },
-      statement_of_purpose: { quality: 'strong', rationale: 'Clear articulation of why this program, why now, and how it connects to a specific career transition.', source: 'interview' },
-      industry_experience:  { quality: 'strong', rationale: 'Two years in logistics with direct operational experience. Named specific roles and responsibilities.', source: 'interview' },
+      program_fit:          { quality: 'strong', rationale: 'Deep knowledge of U of T CS research tracks; clear connection to AI career goals.', source: 'interview' },
+      job_readiness:        { quality: 'strong', rationale: 'Three years software engineering; targeting research/ML role with direct program relevance.', source: 'interview' },
+      grit:                 { quality: 'medium', rationale: 'Showed resilience navigating career transition; backup plan responses were somewhat vague.', source: 'interview' },
+      education_fit:        { quality: 'strong', rationale: 'CS undergraduate degree with strong quantitative foundation; directly applicable to program requirements.', source: 'interview' },
+      trustworthiness:      { quality: 'medium', rationale: 'Consistent answers throughout; proactively disclosed informal nature of employer support.', source: 'interview' },
+      financial_resources:  { quality: 'weak',   rationale: 'Tuition covered by family savings, but CA$600/month employer support is informal with no letter. TA backup not confirmed.', source: 'interview' },
+      network_support:      { quality: 'medium', rationale: 'Family savings committed for tuition; employer top-up mentioned but unconfirmed. No other support sources.', source: 'interview' },
+      risk_level:           { level: 'medium',   rationale: 'Strong technical and academic profile offset by unconfirmed living cost contribution and unconfirmed backup plan.', source: 'interview' },
+      statement_of_purpose: { quality: 'strong', rationale: 'Clear articulation of why CS, why U of T, and how program connects to specific research and career goals.', source: 'interview' },
+      industry_experience:  { quality: 'strong', rationale: 'Three years software engineering with named roles and specific technical responsibilities.', source: 'interview' },
       school_grades_quality:{ quality: 'not_assessed', rationale: 'Cannot be assessed from interview alone. Requires academic transcripts.', source: 'not_assessed' },
     },
     red_flags: [
-      "Priya mentioned ~CA$600/month of employer support in the interview, but there's no support letter on file — and her backup plan relies on part-time work she hasn't lined up yet."
+      "Martin mentioned ~CA$600/month employer support in the interview, but there's no support letter on file — and his backup plan relies on TA positions he hasn't yet confirmed."
     ],
     missing_information: [
-      "Formal support letter from father's employer",
-      'Specific part-time job plan or available hours',
+      "Formal support letter or written agreement from employer",
+      'TA or research assistant position confirmation',
       'Exact family savings amount and drawdown schedule',
     ],
     reviewer_confidence: 'high',
@@ -1480,9 +1410,9 @@ async function run() {
 
   console.log('[review] Captured conversation ID from URL:', convId || '(none)', 'demo:', isDemo);
 
-  // ── DEMO MODE: show pre-built Priya Shah assessment ───────────────────────
+  // ── DEMO MODE: show pre-built Martin Basiri assessment ────────────────────
   if (isDemo || (!convId && !params.get('id'))) {
-    document.getElementById('proc-title').textContent = "Building Priya's assessment";
+    document.getElementById('proc-title').textContent = "Building Martin's assessment";
     procStep(1); await sleep(400);
     procStep(2); document.getElementById('proc-progress').style.width = '30%'; await sleep(700);
     procStep(3); document.getElementById('proc-progress').style.width = '65%'; await sleep(600);
