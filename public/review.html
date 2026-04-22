@@ -932,7 +932,7 @@
     <!-- APPLICANT HEADER -->
     <div class="applicant-header">
       <div class="applicant-left">
-        <div class="applicant-avatar" id="applicant-avatar">—</div>
+        <div class="applicant-avatar" id="applicant-avatar" style="background:none;padding:0;overflow:hidden;"><img src="/images.jpeg" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" /></div>
         <div>
           <div class="applicant-name-row">
             <span class="applicant-name" id="applicant-name">—</span>
@@ -1309,7 +1309,7 @@ function renderResults(data) {
   const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   document.getElementById('bc-name').textContent = name;
   document.getElementById('applicant-name').textContent = name;
-  document.getElementById('applicant-avatar').textContent = initials;
+  const avatarEl = document.getElementById('applicant-avatar'); avatarEl.innerHTML = '<img src="/images.jpeg" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />'; avatarEl.style.background = 'none'; avatarEl.style.padding = '0'; avatarEl.style.overflow = 'hidden';
   document.getElementById('app-id-badge').textContent = meta?.app_id
     ? meta.app_id
     : meta?.conversation_id
