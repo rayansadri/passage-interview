@@ -2,7 +2,7 @@
 
 const express = require("express");
 const Anthropic = require("@anthropic-ai/sdk");
-const fetch = require("node-fetch");
+const https = require("https");
 const fs = require("fs");
 const path = require("path");
 
@@ -64,16 +64,39 @@ function buildTranscriptText(turns) {
     .join("\n");
 }
 
+function httpsGet(url, headers) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(url, { headers }, (res) => {
+      let data = "";
+      res.on("data", (chunk) => { data += chunk; });
+      res.on("end", () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (res.statusCode >= 400) {
+            const err = Object.assign(
+              new Error(`ElevenLabs: ${res.statusCode} — ${data}`),
+              { status: res.statusCode }
+            );
+            reject(err);
+          } else {
+            resolve(parsed);
+          }
+        } catch (e) {
+          reject(new Error(`JSON parse error: ${e.message}`));
+        }
+      });
+    });
+    req.on("error", reject);
+    req.setTimeout(10000, () => { req.destroy(new Error("Request timeout")); });
+    req.end();
+  });
+}
+
 async function fetchConversation(conversationId, elevenKey) {
-  const r = await fetch(
+  return httpsGet(
     `https://api.elevenlabs.io/v1/convai/conversations/${conversationId.trim()}`,
-    { headers: { "xi-api-key": elevenKey } }
+    { "xi-api-key": elevenKey }
   );
-  if (!r.ok) {
-    const msg = await r.text();
-    throw Object.assign(new Error(`ElevenLabs: ${r.status} — ${msg}`), { status: r.status });
-  }
-  return r.json();
 }
 
 async function runClaude(systemPrompt, userMessage) {
@@ -107,15 +130,10 @@ app.get("/api/latest-conversation", async (req, res) => {
   if (!agentId)   return res.status(500).json({ error: "ELEVENLABS_AGENT_ID not set." });
 
   try {
-    const r = await fetch(
+    const data = await httpsGet(
       `https://api.elevenlabs.io/v1/convai/conversations?agent_id=${agentId}&page_size=1`,
-      { headers: { "xi-api-key": elevenKey } }
+      { "xi-api-key": elevenKey }
     );
-    if (!r.ok) {
-      const msg = await r.text();
-      return res.status(r.status).json({ error: `ElevenLabs: ${r.status} — ${msg}` });
-    }
-    const data = await r.json();
     const latest = data.conversations?.[0];
     if (!latest) return res.status(404).json({ error: "No conversations found for this agent." });
     res.json({ conversationId: latest.conversation_id });
@@ -279,20 +297,15 @@ app.get("/api/conversations", async (req, res) => {
   if (!agentId)   return res.status(500).json({ error: "ELEVENLABS_AGENT_ID not set." });
 
   try {
-    const r = await fetch(
+    const data = await httpsGet(
       `https://api.elevenlabs.io/v1/convai/conversations?agent_id=${agentId}&page_size=20`,
-      { headers: { "xi-api-key": elevenKey } }
+      { "xi-api-key": elevenKey }
     );
-    if (!r.ok) {
-      const msg = await r.text();
-      return res.status(r.status).json({ error: `ElevenLabs: ${r.status} — ${msg}` });
-    }
-    const data = await r.json();
     const conversations = (data.conversations || []).map((c) => ({
-      conversation_id:     c.conversation_id,
+      conversation_id:      c.conversation_id,
       start_time_unix_secs: c.start_time_unix_secs,
-      duration_secs:       c.metadata?.call_duration_secs ?? c.call_duration_secs ?? null,
-      status:              c.status,
+      duration_secs:        c.metadata?.call_duration_secs ?? c.call_duration_secs ?? null,
+      status:               c.status,
     }));
     res.json({ conversations });
   } catch (err) {
