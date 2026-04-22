@@ -1214,7 +1214,7 @@ const appIdParam   = params.get('appId') || 'APP-0042';
 
   document.getElementById('bc-name').textContent = nameParam;
   document.getElementById('applicant-name').textContent = nameParam;
-  document.getElementById('applicant-avatar').textContent = initials;
+  const avEl = document.getElementById('applicant-avatar'); avEl.innerHTML = '<img src="/images.jpeg" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />'; avEl.style.background = 'none'; avEl.style.padding = '0'; avEl.style.overflow = 'hidden';
   document.getElementById('app-id-badge').textContent = appIdParam;
   document.getElementById('applicant-subtitle').textContent = `${programParam} · University of Waterloo · ${intakeParam}`;
   document.getElementById('idle-name').textContent = nameParam;
