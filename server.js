@@ -64,9 +64,17 @@ function buildTranscriptText(turns) {
     .join("\n");
 }
 
-function httpsGet(url, headers) {
+function httpsGet(urlStr, headers) {
   return new Promise((resolve, reject) => {
-    const req = https.request(url, { headers }, (res) => {
+    const u = new URL(urlStr);
+    const options = {
+      hostname: u.hostname,
+      port: 443,
+      path: u.pathname + u.search,
+      method: "GET",
+      headers: { ...headers, "Accept": "application/json" },
+    };
+    const req = https.request(options, (res) => {
       let data = "";
       res.on("data", (chunk) => { data += chunk; });
       res.on("end", () => {
@@ -74,7 +82,7 @@ function httpsGet(url, headers) {
           const parsed = JSON.parse(data);
           if (res.statusCode >= 400) {
             const err = Object.assign(
-              new Error(`ElevenLabs: ${res.statusCode} — ${data}`),
+              new Error(`ElevenLabs: ${res.statusCode} — ${data.slice(0, 200)}`),
               { status: res.statusCode }
             );
             reject(err);
@@ -82,12 +90,12 @@ function httpsGet(url, headers) {
             resolve(parsed);
           }
         } catch (e) {
-          reject(new Error(`JSON parse error: ${e.message}`));
+          reject(new Error(`JSON parse error: ${e.message} — raw: ${data.slice(0, 100)}`));
         }
       });
     });
-    req.on("error", reject);
-    req.setTimeout(10000, () => { req.destroy(new Error("Request timeout")); });
+    req.on("error", (e) => reject(new Error(`HTTPS error: ${e.message} (code: ${e.code})`)));
+    req.setTimeout(30000, () => { req.destroy(new Error("Request timeout after 30s")); });
     req.end();
   });
 }
