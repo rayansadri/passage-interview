@@ -607,7 +607,7 @@
       align-items: center;
       gap: 20px;
       width: 100%;
-      max-width: 420px;
+      max-width: 520px;
     }
 
     .speaker-label {
@@ -629,93 +629,12 @@
       animation: rec-blink 1.2s ease-in-out infinite;
     }
 
-    .waveform {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      height: 64px;
-    }
-
-    .wave-bar {
-      width: 4px;
-      border-radius: 2px;
-      background: var(--green);
-      animation: wave-anim 0.8s ease-in-out infinite;
-      transform-origin: bottom;
-    }
-
-    @keyframes wave-anim {
-      0%, 100% { transform: scaleY(0.15); opacity: 0.5; }
-      50%       { transform: scaleY(1);   opacity: 1; }
-    }
-
-    /* Heights for each bar — 60 bars with varied heights */
-    .wave-bar:nth-child(1)  { height: 12px; animation-delay: 0.00s; }
-    .wave-bar:nth-child(2)  { height: 28px; animation-delay: 0.03s; }
-    .wave-bar:nth-child(3)  { height: 40px; animation-delay: 0.06s; }
-    .wave-bar:nth-child(4)  { height: 52px; animation-delay: 0.09s; }
-    .wave-bar:nth-child(5)  { height: 38px; animation-delay: 0.12s; }
-    .wave-bar:nth-child(6)  { height: 60px; animation-delay: 0.15s; }
-    .wave-bar:nth-child(7)  { height: 44px; animation-delay: 0.18s; }
-    .wave-bar:nth-child(8)  { height: 56px; animation-delay: 0.21s; }
-    .wave-bar:nth-child(9)  { height: 36px; animation-delay: 0.24s; }
-    .wave-bar:nth-child(10) { height: 50px; animation-delay: 0.27s; }
-    .wave-bar:nth-child(11) { height: 64px; animation-delay: 0.30s; }
-    .wave-bar:nth-child(12) { height: 48px; animation-delay: 0.33s; }
-    .wave-bar:nth-child(13) { height: 32px; animation-delay: 0.36s; }
-    .wave-bar:nth-child(14) { height: 56px; animation-delay: 0.39s; }
-    .wave-bar:nth-child(15) { height: 42px; animation-delay: 0.42s; }
-    .wave-bar:nth-child(16) { height: 60px; animation-delay: 0.45s; }
-    .wave-bar:nth-child(17) { height: 24px; animation-delay: 0.48s; }
-    .wave-bar:nth-child(18) { height: 50px; animation-delay: 0.51s; }
-    .wave-bar:nth-child(19) { height: 38px; animation-delay: 0.54s; }
-    .wave-bar:nth-child(20) { height: 62px; animation-delay: 0.57s; }
-    .wave-bar:nth-child(21) { height: 46px; animation-delay: 0.60s; }
-    .wave-bar:nth-child(22) { height: 54px; animation-delay: 0.57s; }
-    .wave-bar:nth-child(23) { height: 30px; animation-delay: 0.54s; }
-    .wave-bar:nth-child(24) { height: 58px; animation-delay: 0.51s; }
-    .wave-bar:nth-child(25) { height: 40px; animation-delay: 0.48s; }
-    .wave-bar:nth-child(26) { height: 64px; animation-delay: 0.45s; }
-    .wave-bar:nth-child(27) { height: 36px; animation-delay: 0.42s; }
-    .wave-bar:nth-child(28) { height: 52px; animation-delay: 0.39s; }
-    .wave-bar:nth-child(29) { height: 44px; animation-delay: 0.36s; }
-    .wave-bar:nth-child(30) { height: 60px; animation-delay: 0.33s; }
-    .wave-bar:nth-child(31) { height: 48px; animation-delay: 0.30s; }
-    .wave-bar:nth-child(32) { height: 56px; animation-delay: 0.27s; }
-    .wave-bar:nth-child(33) { height: 32px; animation-delay: 0.24s; }
-    .wave-bar:nth-child(34) { height: 62px; animation-delay: 0.21s; }
-    .wave-bar:nth-child(35) { height: 42px; animation-delay: 0.18s; }
-    .wave-bar:nth-child(36) { height: 58px; animation-delay: 0.15s; }
-    .wave-bar:nth-child(37) { height: 28px; animation-delay: 0.12s; }
-    .wave-bar:nth-child(38) { height: 50px; animation-delay: 0.09s; }
-    .wave-bar:nth-child(39) { height: 38px; animation-delay: 0.06s; }
-    .wave-bar:nth-child(40) { height: 64px; animation-delay: 0.03s; }
-    .wave-bar:nth-child(41) { height: 46px; animation-delay: 0.00s; }
-    .wave-bar:nth-child(42) { height: 54px; animation-delay: 0.03s; }
-    .wave-bar:nth-child(43) { height: 34px; animation-delay: 0.06s; }
-    .wave-bar:nth-child(44) { height: 60px; animation-delay: 0.09s; }
-    .wave-bar:nth-child(45) { height: 40px; animation-delay: 0.12s; }
-    .wave-bar:nth-child(46) { height: 56px; animation-delay: 0.15s; }
-    .wave-bar:nth-child(47) { height: 26px; animation-delay: 0.18s; }
-    .wave-bar:nth-child(48) { height: 50px; animation-delay: 0.21s; }
-    .wave-bar:nth-child(49) { height: 36px; animation-delay: 0.24s; }
-    .wave-bar:nth-child(50) { height: 62px; animation-delay: 0.27s; }
-    .wave-bar:nth-child(51) { height: 44px; animation-delay: 0.30s; }
-    .wave-bar:nth-child(52) { height: 58px; animation-delay: 0.33s; }
-    .wave-bar:nth-child(53) { height: 30px; animation-delay: 0.36s; }
-    .wave-bar:nth-child(54) { height: 52px; animation-delay: 0.39s; }
-    .wave-bar:nth-child(55) { height: 42px; animation-delay: 0.42s; }
-    .wave-bar:nth-child(56) { height: 60px; animation-delay: 0.45s; }
-    .wave-bar:nth-child(57) { height: 24px; animation-delay: 0.48s; }
-    .wave-bar:nth-child(58) { height: 48px; animation-delay: 0.51s; }
-    .wave-bar:nth-child(59) { height: 38px; animation-delay: 0.54s; }
-    .wave-bar:nth-child(60) { height: 16px; animation-delay: 0.57s; }
-
-    /* Inactive waveform = very short, no animation bounce */
-    .waveform.inactive .wave-bar {
-      animation: none;
-      transform: scaleY(0.15);
-      opacity: 0.3;
+    #waveform-canvas {
+      display: block;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 520px;
+      height: 120px;
     }
 
     .current-speech {
@@ -1256,29 +1175,7 @@
             <span class="speaker-dot" id="speaker-dot"></span>
             <span id="speaker-name-label">PRIYA</span>
           </div>
-          <div class="waveform inactive" id="waveform">
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-          </div>
+          <canvas id="waveform-canvas" width="1040" height="240"></canvas>
           <div class="current-speech" id="current-speech">Listening…</div>
         </div>
 
@@ -1430,7 +1327,7 @@ function setState(s) {
     timerEl.style.display = 'none';
     bottomCenter.style.display = 'none';
     bottomRight.style.display = 'none';
-    document.getElementById('waveform')?.classList.add('inactive');
+    wfSpeaker = 'idle';
   } else if (s === 'connecting') {
     btnBegin.style.display = 'none';
     btnEnd.style.display = 'none';
@@ -1499,21 +1396,125 @@ function stopTimer() {
   clearInterval(timerHandle);
 }
 
+// ── Canvas Waveform Visualizer ─────────────────────────────────────────────────
+let wfAudioCtx = null;
+let wfAnalyser  = null;
+let wfMicStream = null;
+let wfRAF       = null;
+let wfSpeaker   = 'agent'; // 'agent' | 'student' | 'idle'
+let wfPhase     = 0;
+// Smoothed bar heights for nice interpolation
+let wfSmoothed  = new Float32Array(80).fill(0.05);
+
+async function startWaveform() {
+  // Try real mic audio for visualization
+  try {
+    wfMicStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    wfAudioCtx  = new (window.AudioContext || window.webkitAudioContext)();
+    const src   = wfAudioCtx.createMediaStreamSource(wfMicStream);
+    wfAnalyser  = wfAudioCtx.createAnalyser();
+    wfAnalyser.fftSize = 256;
+    wfAnalyser.smoothingTimeConstant = 0.82;
+    src.connect(wfAnalyser);
+  } catch(e) {
+    console.log('[waveform] No mic access for visualization, using synthetic animation');
+  }
+  wfDrawLoop();
+}
+
+function stopWaveform() {
+  if (wfRAF) { cancelAnimationFrame(wfRAF); wfRAF = null; }
+  if (wfMicStream) { wfMicStream.getTracks().forEach(t => t.stop()); wfMicStream = null; }
+  if (wfAudioCtx)  { wfAudioCtx.close(); wfAudioCtx = null; }
+}
+
+function wfDrawLoop() {
+  const canvas = document.getElementById('waveform-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+  const BAR_COUNT = 80;
+  const BAR_W = 4;
+  const GAP   = 4;
+  const totalW = BAR_COUNT * (BAR_W + GAP) - GAP;
+  const startX = (W - totalW) / 2;
+
+  let freqData;
+  if (wfAnalyser) freqData = new Uint8Array(wfAnalyser.frequencyBinCount);
+
+  function draw() {
+    wfRAF = requestAnimationFrame(draw);
+    ctx.clearRect(0, 0, W, H);
+
+    wfPhase += 0.04;
+
+    // Determine color and amplitude scale
+    const isStudent = wfSpeaker === 'student';
+    const isIdle    = wfSpeaker === 'idle';
+    const color     = isStudent ? '#16a34a' : '#1a1a1a';
+    const alpha     = isIdle ? 0.18 : 1;
+    const ampScale  = isIdle ? 0.12 : 1;
+
+    ctx.globalAlpha = alpha;
+
+    if (wfAnalyser && freqData) {
+      wfAnalyser.getByteFrequencyData(freqData);
+    }
+
+    for (let i = 0; i < BAR_COUNT; i++) {
+      let target;
+      if (wfAnalyser && freqData) {
+        // Real audio data
+        const bin = Math.floor((i / BAR_COUNT) * wfAnalyser.frequencyBinCount * 0.75);
+        target = (freqData[bin] / 255) * ampScale;
+      } else {
+        // Synthetic: layered sine waves for organic feel
+        const t = wfPhase;
+        const base = 0.15 + 0.08 * Math.sin(i * 0.18 + 1.2);
+        const wave = 0.35 * Math.sin(t * 1.1 + i * 0.22)
+                   + 0.20 * Math.sin(t * 2.3 + i * 0.14)
+                   + 0.10 * Math.sin(t * 0.7 + i * 0.35)
+                   + 0.05 * (Math.random() - 0.5);
+        target = Math.max(0.04, Math.min(1, (base + wave) * ampScale));
+      }
+
+      // Smooth towards target
+      wfSmoothed[i] += (target - wfSmoothed[i]) * 0.25;
+      const barH = Math.max(3, wfSmoothed[i] * H * 0.88);
+
+      const x = startX + i * (BAR_W + GAP);
+      const y = (H - barH) / 2;
+
+      ctx.fillStyle = isIdle ? '#c8c8c8' : color;
+      // Rounded rect
+      const r = Math.min(2, BAR_W / 2);
+      ctx.beginPath();
+      ctx.roundRect(x, y, BAR_W, barH, r);
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  draw();
+}
+
 // ── Waveform ──────────────────────────────────────────────────────────────────
 function setWaveformActive(isStudentSpeaking) {
-  const wf = document.getElementById('waveform');
   const spLabel = document.getElementById('speaker-name-label');
-  const spDot = document.getElementById('speaker-dot');
-  const speechEl = document.getElementById('current-speech');
+  const spDot   = document.getElementById('speaker-dot');
 
   if (isStudentSpeaking) {
-    wf.classList.remove('inactive');
+    wfSpeaker = 'student';
     spLabel.textContent = nameParam.split(' ')[0].toUpperCase();
     spDot.style.background = 'var(--green)';
+    spLabel.style.color = 'var(--green)';
   } else {
-    wf.classList.add('inactive');
+    wfSpeaker = 'agent';
     spLabel.textContent = 'PASSAGE';
     spDot.style.background = 'var(--dim)';
+    spLabel.style.color = 'var(--muted)';
   }
 }
 
@@ -1628,12 +1629,13 @@ async function startInterview() {
         setState('active');
         startTimer();
         setWaveformActive(false);
+        startWaveform();
       },
 
       onDisconnect: () => {
         console.log('[interview] onDisconnect — convId at disconnect:', convId);
         stopTimer();
-        setWaveformActive(false);
+        stopWaveform();
         handleInterviewEnd(convId);
       },
 

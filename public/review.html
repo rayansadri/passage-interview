@@ -1377,7 +1377,7 @@ function renderResults(data) {
   console.log('[review] renderResults called');
 
   // Update applicant header
-  const name = meta?.applicant_name || 'Applicant';
+  const name = meta?.applicant_name || meta?.agent_name?.replace('Passage AI','') || 'Applicant';
   const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   document.getElementById('bc-name').textContent = name;
   document.getElementById('applicant-name').textContent = name;
@@ -1421,12 +1421,75 @@ function renderResults(data) {
   document.getElementById('state-results').classList.add('fadein');
 }
 
+// ── Demo data (Priya Shah) ────────────────────────────────────────────────────
+const DEMO_DATA = {
+  meta: {
+    conversation_id: 'conv_demo_priya_shah_001',
+    agent_name: 'Passage AI',
+    duration_secs: 497,
+    termination_reason: 'end_call_completed',
+    analyzed_at: new Date().toISOString(),
+    applicant_name: 'Priya Shah',
+    program_name: 'Supply Chain Management, PG',
+    institution: 'Humber College',
+    intake: 'Fall 2026',
+  },
+  transcript: [
+    { role: 'agent',   text: "Hi Priya, thanks for joining today. Can you tell me what drew you to the Supply Chain Management program at Humber?", ts: '0:05' },
+    { role: 'student', text: "I've been working in logistics for two years and I want to move into a management role. The program's focus on Canadian supply chain regulations and the co-op placement really stood out to me.", ts: '0:18' },
+    { role: 'agent',   text: 'How are you planning to cover tuition and living costs during the program?', ts: '2:45' },
+    { role: 'student', text: "Tuition is covered by family savings. For living costs, my father's employer is topping up about CA$600 a month, and I'll take a part-time job on campus.", ts: '3:02' },
+    { role: 'agent',   text: 'Do you have a support letter from them, and is that support committed for the full year?', ts: '3:28' },
+    { role: 'student', text: "Honestly, I don't have a letter yet — it's an informal arrangement with his manager.", ts: '3:45' },
+    { role: 'agent',   text: "If that arrangement falls through, what's your backup plan for living expenses?", ts: '4:10' },
+    { role: 'student', text: "I'd probably increase my part-time hours or borrow from family, but I haven't worked out the exact details yet.", ts: '4:22' },
+  ],
+  analysis: {
+    executive_summary: "Priya Shah presents as a focused and well-prepared candidate for the Supply Chain Management program at Humber College. She brings two years of logistics experience and demonstrates clear alignment between her career goals and the program's offerings. However, her funding plan contains a significant gap: a CA$600/month employer contribution from her father's workplace is unconfirmed and undocumented. Her backup plan for living costs is underdeveloped. Overall signals are positive but the funding gap requires clarification before a final decision.",
+    dimensions: {
+      program_fit:          { quality: 'strong', rationale: 'Specific knowledge of program co-op structure and Canadian regulations focus. Clear connection to career goals.', source: 'interview' },
+      job_readiness:        { quality: 'strong', rationale: 'Two years of direct logistics experience; targeting a management role with a clear program-to-career pathway.', source: 'interview' },
+      grit:                 { quality: 'medium', rationale: 'Mentioned managing a relocation independently, but gave vague responses to adversity follow-ups.', source: 'interview' },
+      education_fit:        { quality: 'strong', rationale: 'Business undergraduate degree with relevant quantitative coursework; directly applicable to program requirements.', source: 'interview' },
+      trustworthiness:      { quality: 'medium', rationale: 'Consistent across most answers; proactively disclosed the informal nature of employer support without prompting.', source: 'interview' },
+      financial_resources:  { quality: 'weak',   rationale: 'Tuition covered by family savings (confirmed), but CA$600/month living support is informal with no letter. Backup plan is vague.', source: 'interview' },
+      network_support:      { quality: 'medium', rationale: 'Family savings committed for tuition; employer top-up mentioned but unconfirmed. No other support sources identified.', source: 'interview' },
+      risk_level:           { level: 'medium',   rationale: 'Strong academic and professional profile undermined by an unconfirmed living cost contribution and no concrete backup plan.', source: 'interview' },
+      statement_of_purpose: { quality: 'strong', rationale: 'Clear articulation of why this program, why now, and how it connects to a specific career transition.', source: 'interview' },
+      industry_experience:  { quality: 'strong', rationale: 'Two years in logistics with direct operational experience. Named specific roles and responsibilities.', source: 'interview' },
+      school_grades_quality:{ quality: 'not_assessed', rationale: 'Cannot be assessed from interview alone. Requires academic transcripts.', source: 'not_assessed' },
+    },
+    red_flags: [
+      "Priya mentioned ~CA$600/month of employer support in the interview, but there's no support letter on file — and her backup plan relies on part-time work she hasn't lined up yet."
+    ],
+    missing_information: [
+      "Formal support letter from father's employer",
+      'Specific part-time job plan or available hours',
+      'Exact family savings amount and drawdown schedule',
+    ],
+    reviewer_confidence: 'high',
+    reviewer_note: 'Request a formal support letter from the employer before final decision. If confirmed, risk level drops to low and admission is straightforward.',
+  }
+};
+
 // ── Main: auto-process from URL ───────────────────────────────────────────────
 async function run() {
   const params = new URLSearchParams(window.location.search);
+  const isDemo = params.get('demo') === '1';
   const convId = (params.get('id') || '').trim().replace(/.*?(conv_[a-zA-Z0-9]+).*/, '$1');
 
-  console.log('[review] Captured conversation ID from URL:', convId || '(none)');
+  console.log('[review] Captured conversation ID from URL:', convId || '(none)', 'demo:', isDemo);
+
+  // ── DEMO MODE: show pre-built Priya Shah assessment ───────────────────────
+  if (isDemo || (!convId && !params.get('id'))) {
+    document.getElementById('proc-title').textContent = "Building Priya's assessment";
+    procStep(1); await sleep(400);
+    procStep(2); document.getElementById('proc-progress').style.width = '30%'; await sleep(700);
+    procStep(3); document.getElementById('proc-progress').style.width = '65%'; await sleep(600);
+    procStep(4); document.getElementById('proc-progress').style.width = '90%'; await sleep(400);
+    renderResults(DEMO_DATA);
+    return;
+  }
 
   if (!convId) {
     hide('state-processing');
