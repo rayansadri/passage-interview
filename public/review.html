@@ -35,6 +35,7 @@
 
     /* ── APP SHELL ── */
     .app {
+      zoom: 1.15;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -898,9 +899,9 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-avatar">MA</div>
+      <div class="user-avatar">RS</div>
       <div>
-        <div class="user-name">Maya Adeyemi</div>
+        <div class="user-name">Rayan Sadri</div>
         <div class="user-role">Reviewer</div>
       </div>
     </div>
@@ -924,7 +925,7 @@
             <circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5"/>
           </svg>
         </button>
-        <div class="topbar-avatar">MA</div>
+        <div class="topbar-avatar">RS</div>
       </div>
     </div>
 
@@ -1082,9 +1083,9 @@
             <div class="rsidebar-section">
               <div class="rsidebar-label">Routing</div>
               <div class="routing-row">
-                <div class="routing-avatar">MA</div>
+                <div class="routing-avatar">RS</div>
                 <div>
-                  <div class="routing-name">Maya Adeyemi</div>
+                  <div class="routing-name">Rayan Sadri</div>
                   <div class="routing-meta">SLA 24h · assigned</div>
                 </div>
               </div>
@@ -1360,12 +1361,12 @@ const DEMO_DATA = {
     termination_reason: 'end_call_completed',
     analyzed_at: new Date().toISOString(),
     applicant_name: 'Martin Basiri',
-    program_name: 'Computer Science, PG',
-    institution: 'University of Toronto',
+    program_name: 'Electrical Engineering, PG',
+    institution: 'University of Waterloo',
     intake: 'Fall 2026',
   },
   transcript: [
-    { role: 'agent',   text: "Hi Martin, thanks for joining today. Can you tell me what drew you to the Computer Science program at the University of Toronto?", ts: '0:05' },
+    { role: 'agent',   text: "Hi Martin, thanks for joining today. Can you tell me what drew you to the Electrical Engineering program at the University of Waterloo?", ts: '0:05' },
     { role: 'student', text: "I've been working as a software engineer for three years and I want to move into research and applied ML. U of T's CS program has a strong AI research track and the connections to the industry here are exactly what I'm looking for.", ts: '0:20' },
     { role: 'agent',   text: 'How are you planning to cover tuition and living costs during the program?', ts: '2:55' },
     { role: 'student', text: "Tuition is covered by family savings. For living costs, my employer said they'd contribute about CA$600 a month since I'll still be doing some part-time consulting for them.", ts: '3:12' },
@@ -1375,7 +1376,7 @@ const DEMO_DATA = {
     { role: 'student', text: "I'd look for a TA position or part-time research role in the department. I haven't confirmed anything yet but those positions are usually available.", ts: '4:35' },
   ],
   analysis: {
-    executive_summary: "Martin Basiri is a strong candidate for the Computer Science PG program at the University of Toronto. He brings three years of software industry experience and demonstrates clear alignment between his career goals and the program's AI/research focus. His academic background and technical skills are directly relevant. However, his funding plan has a gap: a CA$600/month employer contribution is informal with no letter on file, and his backup plan relies on TA positions he has not yet secured. Overall profile is strong but the funding documentation requires clarification before final decision.",
+    executive_summary: "Martin Basiri is a strong candidate for the Electrical Engineering PG program at the University of Waterloo. He brings three years of software industry experience and demonstrates clear alignment between his career goals and the program's AI/research focus. His academic background and technical skills are directly relevant. However, his funding plan has a gap: a CA$600/month employer contribution is informal with no letter on file, and his backup plan relies on TA positions he has not yet secured. Overall profile is strong but the funding documentation requires clarification before final decision.",
     dimensions: {
       program_fit:          { quality: 'strong', rationale: 'Deep knowledge of U of T CS research tracks; clear connection to AI career goals.', source: 'interview' },
       job_readiness:        { quality: 'strong', rationale: 'Three years software engineering; targeting research/ML role with direct program relevance.', source: 'interview' },

@@ -34,6 +34,7 @@
 
     /* ── APP SHELL ── */
     .app {
+      zoom: 1.15;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -970,9 +971,9 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-avatar">MA</div>
+      <div class="user-avatar">RS</div>
       <div class="user-info">
-        <div class="user-name">Maya Adeyemi</div>
+        <div class="user-name">Rayan Sadri</div>
         <div class="user-role">Reviewer</div>
       </div>
     </div>
@@ -1006,7 +1007,7 @@
             <circle cx="7" cy="7" r="5.5"/><path d="M5.5 5.5a1.5 1.5 0 113 0c0 1-1.5 1.5-1.5 2.5"/><circle cx="7" cy="11" r="0.6" fill="currentColor"/>
           </svg>
         </button>
-        <div class="topbar-avatar">MA</div>
+        <div class="topbar-avatar">RS</div>
       </div>
     </div>
 
@@ -1019,7 +1020,7 @@
             <span class="applicant-name" id="applicant-name">Martin Basiri</span>
             <span class="app-id-badge" id="app-id-badge">APP-0042</span>
           </div>
-          <div class="applicant-subtitle" id="applicant-subtitle">Computer Science, PG · University of Toronto · Fall 2026</div>
+          <div class="applicant-subtitle" id="applicant-subtitle">Electrical Engineering, PG · University of Waterloo · Fall 2026</div>
         </div>
       </div>
       <div class="applicant-right">
@@ -1063,7 +1064,7 @@
           Backup plan
         </div>
       </div>
-      <span class="scoring-template">Scoring template: PGWP · Computer Science</span>
+      <span class="scoring-template">Scoring template: PGWP · Electrical Engineering</span>
     </div>
 
     <!-- CONTENT AREA -->
@@ -1202,7 +1203,7 @@ let currentState = 'idle';
 // ── Applicant context from URL params ─────────────────────────────────────────
 const params  = new URLSearchParams(window.location.search);
 const nameParam    = params.get('name') || 'Martin Basiri';
-const programParam = params.get('program') || 'Computer Science, PG';
+const programParam = params.get('program') || 'Electrical Engineering, PG';
 const intakeParam  = params.get('intake') || 'Fall 2026';
 const appIdParam   = params.get('appId') || 'APP-0042';
 
@@ -1215,7 +1216,7 @@ const appIdParam   = params.get('appId') || 'APP-0042';
   document.getElementById('applicant-name').textContent = nameParam;
   document.getElementById('applicant-avatar').textContent = initials;
   document.getElementById('app-id-badge').textContent = appIdParam;
-  document.getElementById('applicant-subtitle').textContent = `${programParam} · University of Toronto · ${intakeParam}`;
+  document.getElementById('applicant-subtitle').textContent = `${programParam} · University of Waterloo · ${intakeParam}`;
   document.getElementById('idle-name').textContent = nameParam;
   document.getElementById('speaker-name-label').textContent = firstName.toUpperCase();
   document.getElementById('proc-title').textContent = `Building ${firstName}'s assessment`;
