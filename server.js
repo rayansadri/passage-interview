@@ -8,6 +8,16 @@ const path = require("path");
 
 const app = express();
 app.use(express.json());
+
+// Disable caching for HTML files so Railway deploys always show immediately
+app.use((req, res, next) => {
+  if (req.path.endsWith(".html")) {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, "public")));
 
 // ── Prompts ───────────────────────────────────────────────────────────────────
