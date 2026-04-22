@@ -117,7 +117,23 @@ app.get("/api/config", (req, res) => {
   res.json({
     agentId: process.env.ELEVENLABS_AGENT_ID || null,
     ready: !!(process.env.ELEVENLABS_API_KEY && process.env.ANTHROPIC_API_KEY),
+    transport: "https-module-v2",
   });
+});
+
+// ── Network diagnostic ────────────────────────────────────────────────────────
+
+app.get("/api/ping-eleven", async (req, res) => {
+  const elevenKey = process.env.ELEVENLABS_API_KEY;
+  try {
+    const data = await httpsGet(
+      `https://api.elevenlabs.io/v1/convai/conversations?agent_id=${process.env.ELEVENLABS_AGENT_ID}&page_size=1`,
+      { "xi-api-key": elevenKey }
+    );
+    res.json({ ok: true, count: data.conversations?.length });
+  } catch (err) {
+    res.json({ ok: false, error: err.message, code: err.code });
+  }
 });
 
 // ── Latest conversation (for auto-capture fallback) ───────────────────────────
